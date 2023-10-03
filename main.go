@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -58,22 +59,74 @@ func playersRemove(players []string, player string) []string {
 	return out
 }
 
+func savePairsToFile(pairs map[string]string, name string) error {
+	// delete existing pairs
+	os.Remove(name)
+
+	b, err := json.MarshalIndent(pairs, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(name, b, 0666)
+}
+
+func loadPairsFromFile(name string) (map[string]string, error) {
+	b, err := os.ReadFile(name)
+	if err != nil {
+		return nil, err
+	}
+
+	var pairs map[string]string
+	err = json.Unmarshal(b, &pairs)
+	if err != nil {
+		return nil, err
+	}
+
+	return pairs, nil
+}
+
+const (
+	playersFile = "players.txt"
+	pairsFile   = "pairs.json"
+)
+
 func main() {
-	players, err := getPlayersFromFile("players.txt")
+	players, err := getPlayersFromFile(playersFile)
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println(players)
+	if !(len(players) == 8 || len(players) == 12) {
+		log.Fatalf("players should be 8 or 12 but got: %d: %v", len(players), players)
+	}
+	fmt.Println("=== Player List:", players)
+
+	prevPairs, err := loadPairsFromFile(pairsFile)
+	if err != nil {
+		fmt.Println("No previous pairs found.")
+		prevPairs = map[string]string{}
+	}
+	fmt.Println("== Previous Teams:", prevPairs)
+	fmt.Println()
+	pairs := map[string]string{}
 
 	var player string
 	for len(players) > 1 {
 		player, players = playersPop(players)
+		prevPartner, _ := prevPairs[player]
+		fmt.Printf("= Selecting partner for %s\n", player)
+		fmt.Printf("\tLast partner: %s\n", prevPartner)
 
 		var choices []weightedrand.Choice[string, int]
 		for i, p := range players {
+			if p == prevPartner {
+				// no probability to be selected
+				choices = append(choices, weightedrand.NewChoice(p, 0))
+			}
 			choices = append(choices, weightedrand.NewChoice(p, i+1))
 		}
 
+		fmt.Println("\tProbabilities:", choices)
 		chooser, err := weightedrand.NewChooser(choices...)
 		if err != nil {
 			log.Fatal(err)
@@ -81,6 +134,15 @@ func main() {
 		result := chooser.Pick()
 		players = playersRemove(players, result)
 
-		log.Println(player, result)
+		fmt.Println("\n>> ", player, result)
+		fmt.Println()
+		pairs[player] = result
+	}
+	fmt.Println("=====================\n\n")
+	fmt.Println("Teams:", pairs)
+
+	err = savePairsToFile(pairs, pairsFile)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
