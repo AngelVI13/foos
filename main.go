@@ -13,7 +13,7 @@ import (
 func getPlayersFromFile(name string) ([]string, error) {
 	b, err := os.ReadFile(name)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var players []string
@@ -88,13 +88,21 @@ func loadPairsFromFile(name string) (map[string]string, error) {
 
 const (
 	playersFile = "players.txt"
-	pairsFile   = "pairs.json"
+	pairsFile   = "team.json"
 )
 
 func main() {
 	players, err := getPlayersFromFile(playersFile)
 	if err != nil {
 		log.Println(err)
+		log.Fatal(`
+
+        couldn't process players file.
+        make sure you create a file 'players.txt' in the same directory as the script
+        with each players name on a separate line starting from the strongest player
+        (at the top of the file) and finishing with the least strong player on the last
+        line.
+        `)
 	}
 	if !(len(players) == 8 || len(players) == 12) {
 		log.Fatalf("players should be 8 or 12 but got: %d: %v", len(players), players)
@@ -103,7 +111,7 @@ func main() {
 
 	prevPairs, err := loadPairsFromFile(pairsFile)
 	if err != nil {
-		fmt.Println("No previous pairs found.")
+		fmt.Println("No previous teams found.")
 		prevPairs = map[string]string{}
 	}
 	fmt.Println("== Previous Teams:", prevPairs)
