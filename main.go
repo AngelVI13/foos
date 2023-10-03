@@ -130,8 +130,9 @@ func main() {
 			if p == prevPartner {
 				// no probability to be selected
 				choices = append(choices, weightedrand.NewChoice(p, 0))
+			} else {
+				choices = append(choices, weightedrand.NewChoice(p, i+1))
 			}
-			choices = append(choices, weightedrand.NewChoice(p, i+1))
 		}
 
 		fmt.Println("\tProbabilities:", choices)
