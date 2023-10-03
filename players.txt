@@ -1,0 +1,9 @@
+# order players based on ranking from best to not best
+Ugnius
+Augustas
+Vygintas
+Anupras
+Arturas
+Alina
+Angel
+Rokas
