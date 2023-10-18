@@ -86,36 +86,7 @@ func loadPairsFromFile(name string) map[string]string {
 	return pairs
 }
 
-const (
-	playersFile     = "players.txt"
-	pairsFile1      = "teams1.json"
-	pairsFile2      = "teams2.json"
-	playersErrorTxt = `
-
-    couldn't process players file.
-    make sure you create a file 'players.txt' in the same directory as the script
-    with each players name on a separate line starting from the strongest player
-    (at the top of the file) and finishing with the least strong player on the last
-    line.
-    `
-)
-
-func main() {
-	players, err := getPlayersFromFile(playersFile)
-	if err != nil {
-		log.Println(err)
-		log.Fatal(playersErrorTxt)
-	}
-	if !(len(players) == 8 || len(players) == 12) {
-		log.Fatalf("players should be 8 or 12 but got: %d: %v", len(players), players)
-	}
-	fmt.Println("=== Player List:", players)
-
-	prevPairs1 := loadPairsFromFile(pairsFile1)
-	prevPairs2 := loadPairsFromFile(pairsFile2)
-	fmt.Println("== Previous Teams1:", prevPairs1)
-	fmt.Println("== Previous Teams2:", prevPairs2)
-	fmt.Println()
+func generatePairs(players []string, prevPairs1, prevPairs2 map[string]string) map[string]string {
 	pairs := map[string]string{}
 
 	var player string
@@ -148,6 +119,42 @@ func main() {
 		fmt.Println()
 		pairs[player] = result
 	}
+	return pairs
+}
+
+const (
+	playersFile     = "players.txt"
+	pairsFile1      = "teams1.json"
+	pairsFile2      = "teams2.json"
+	playersErrorTxt = `
+
+    couldn't process players file.
+    make sure you create a file 'players.txt' in the same directory as the script
+    with each players name on a separate line starting from the strongest player
+    (at the top of the file) and finishing with the least strong player on the last
+    line.
+    `
+)
+
+func main() {
+	players, err := getPlayersFromFile(playersFile)
+	if err != nil {
+		log.Println(err)
+		log.Fatal(playersErrorTxt)
+	}
+	if !(len(players) == 8 || len(players) == 12) {
+		log.Fatalf("players should be 8 or 12 but got: %d: %v", len(players), players)
+	}
+	fmt.Println("=== Player List:", players)
+
+	prevPairs1 := loadPairsFromFile(pairsFile1)
+	prevPairs2 := loadPairsFromFile(pairsFile2)
+	fmt.Println("== Previous Teams1:", prevPairs1)
+	fmt.Println("== Previous Teams2:", prevPairs2)
+	fmt.Println()
+
+	pairs := generatePairs(players, prevPairs1, prevPairs2)
+
 	fmt.Println("=====================\n\n")
 	fmt.Println("Teams:", pairs)
 
