@@ -217,7 +217,7 @@ func UsersForm() templ.Component {
 		if err != nil {
 			return err
 		}
-		_, err = templBuffer.WriteString("</label><textarea class=\"form-control\" id=\"playerslistinput\" aria-describedby=\"playersListHelp\"></textarea><div id=\"playersListHelp\" class=\"form-text\">")
+		_, err = templBuffer.WriteString("</label><textarea class=\"form-control\" id=\"playerslistinput\" aria-describedby=\"playersListHelp\" rows=\"12\"></textarea><div id=\"playersListHelp\" class=\"form-text\">")
 		if err != nil {
 			return err
 		}
