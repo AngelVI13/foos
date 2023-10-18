@@ -1,0 +1,50 @@
+package views
+
+import "strconv"
+
+css border() {
+	border: 1px solid #eeeeee;
+	border-radius: 4px;
+	margin: 10px;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
+templ counts(global int) {
+	<form id="countsForm" action="/" method="POST" hx-post="/" hx-select="#countsForm" hx-swap="outerHTML">
+		<div class="columns">
+			<div class={ "column", "has-text-centered", "is-primary", border }>
+				<h1 class="title is-size-1 has-text-centered">{ strconv.Itoa(global) }</h1>
+				<p class="subtitle has-text-centered">Global</p>
+				<div><button class="button is-primary" type="submit" name="global" value="global">+1</button></div>
+			</div>
+		</div>
+	</form>
+}
+
+templ Page(global int) {
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Counts</title>
+            <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+		</head>
+		<body class="bg-gray-100">
+			<header class="hero is-primary">
+				<div class="hero-body">
+					<div class="container">
+						<h1 class="title">Counts</h1>
+					</div>
+				</div>
+			</header>
+			<section class="section">
+				<div class="container">
+					<div class="columns is-centered">
+						<div class="column is-half">@counts(global)</div>
+					</div>
+				</div>
+			</section>
+		</body>
+	</html>
+}
