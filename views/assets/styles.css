@@ -1,0 +1,20 @@
+body,
+html {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+.container {
+  display:flex;
+  gap: 4em;
+}
+
+.table {
+    margin-top: 2em;
+    margin-bottom: 4em;
+}
+
+.column {
+  flex:1;
+  height:100vh;
+}

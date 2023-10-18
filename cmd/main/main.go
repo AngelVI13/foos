@@ -21,18 +21,12 @@ func main() {
 	r := gin.Default()
 	r.HTMLRender = &views.TemplRender{}
 
+	r.StaticFS("/static", http.FS(views.EmbedFs))
+
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "", views.Page(global.Count))
+		c.HTML(http.StatusOK, "", views.Page(views.UsersForm()))
 	})
 
-	r.POST("/", func(c *gin.Context) {
-		v := c.PostForm("global")
-		if v == "global" {
-			global.Count++
-		}
-		log.Info("", "global", v)
-		c.HTML(http.StatusOK, "", views.Page(global.Count))
-	})
 	log.Info("Running")
 
 	r.Run(":5555")

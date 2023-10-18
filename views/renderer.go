@@ -2,11 +2,15 @@ package views
 
 import (
 	"context"
+	"embed"
 	"net/http"
 
 	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin/render"
 )
+
+//go:embed assets/*
+var EmbedFs embed.FS
 
 type TemplRender struct {
 	Code int
