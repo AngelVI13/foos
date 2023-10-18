@@ -59,75 +59,76 @@ func playersRemove(players []string, player string) []string {
 	return out
 }
 
-func savePairsToFile(pairs map[string]string, name string) error {
+func savePairsToFile(pairs map[string]string, newPairsName, lastPairsName string) error {
 	// delete existing pairs
-	os.Remove(name)
+	os.Rename(newPairsName, lastPairsName)
 
 	b, err := json.MarshalIndent(pairs, "", "\t")
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(name, b, 0666)
+	return os.WriteFile(newPairsName, b, 0o666)
 }
 
-func loadPairsFromFile(name string) (map[string]string, error) {
+func loadPairsFromFile(name string) map[string]string {
 	b, err := os.ReadFile(name)
 	if err != nil {
-		return nil, err
+		return map[string]string{}
 	}
 
 	var pairs map[string]string
 	err = json.Unmarshal(b, &pairs)
 	if err != nil {
-		return nil, err
+		return map[string]string{}
 	}
 
-	return pairs, nil
+	return pairs
 }
 
 const (
-	playersFile = "players.txt"
-	pairsFile   = "team.json"
+	playersFile     = "players.txt"
+	pairsFile1      = "teams1.json"
+	pairsFile2      = "teams2.json"
+	playersErrorTxt = `
+
+    couldn't process players file.
+    make sure you create a file 'players.txt' in the same directory as the script
+    with each players name on a separate line starting from the strongest player
+    (at the top of the file) and finishing with the least strong player on the last
+    line.
+    `
 )
 
 func main() {
 	players, err := getPlayersFromFile(playersFile)
 	if err != nil {
 		log.Println(err)
-		log.Fatal(`
-
-        couldn't process players file.
-        make sure you create a file 'players.txt' in the same directory as the script
-        with each players name on a separate line starting from the strongest player
-        (at the top of the file) and finishing with the least strong player on the last
-        line.
-        `)
+		log.Fatal(playersErrorTxt)
 	}
 	if !(len(players) == 8 || len(players) == 12) {
 		log.Fatalf("players should be 8 or 12 but got: %d: %v", len(players), players)
 	}
 	fmt.Println("=== Player List:", players)
 
-	prevPairs, err := loadPairsFromFile(pairsFile)
-	if err != nil {
-		fmt.Println("No previous teams found.")
-		prevPairs = map[string]string{}
-	}
-	fmt.Println("== Previous Teams:", prevPairs)
+	prevPairs1 := loadPairsFromFile(pairsFile1)
+	prevPairs2 := loadPairsFromFile(pairsFile2)
+	fmt.Println("== Previous Teams1:", prevPairs1)
+	fmt.Println("== Previous Teams2:", prevPairs2)
 	fmt.Println()
 	pairs := map[string]string{}
 
 	var player string
 	for len(players) > 1 {
 		player, players = playersPop(players)
-		prevPartner, _ := prevPairs[player]
+		prevPartner1 := prevPairs1[player]
+		prevPartner2 := prevPairs2[player]
 		fmt.Printf("= Selecting partner for %s\n", player)
-		fmt.Printf("\tLast partner: %s\n", prevPartner)
+		fmt.Printf("\tLast partners: %s %s\n", prevPartner1, prevPartner2)
 
 		var choices []weightedrand.Choice[string, int]
 		for i, p := range players {
-			if p == prevPartner {
+			if p == prevPartner1 || p == prevPartner2 {
 				// no probability to be selected
 				choices = append(choices, weightedrand.NewChoice(p, 0))
 			} else {
@@ -150,7 +151,7 @@ func main() {
 	fmt.Println("=====================\n\n")
 	fmt.Println("Teams:", pairs)
 
-	err = savePairsToFile(pairs, pairsFile)
+	err = savePairsToFile(pairs, pairsFile1, pairsFile2)
 	if err != nil {
 		log.Fatal(err)
 	}
