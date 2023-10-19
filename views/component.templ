@@ -5,23 +5,76 @@ import (
 	"github.com/AngelVI13/foos/game"
 )
 
+
+templ InlineEditBtn(url string) {
+<a class="m-1 link-warning" hx-get="{url}" hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML">
+    @EditIcon()
+</a>
+}
+
+templ InlineSaveBtn(url string) {
+<a class="m-1 link-success" hx-put="{url}" hx-exc="json-enc" hx-trigger="click" hx-include="closest tr" hx-target="closest tr" hx-swap="outerHTML"> 
+    @ConfirmIcon()
+</a>
+}
+
+templ InlineCancelBtn(url string) {
+<a class="m-1 link-danger" hx-get="{url}" hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML">
+    @CancelIcon()
+</a>
+}
+
+
 templ Rounds(rounds game.Rounds) {
     for _, round := range rounds.All {
         @Bracket(round)
     }
+
+    @Standings(rounds.Teams)
+}
+
+
+templ Standings(teams []*game.Team) {
+<div class="column">
+    <h3>Standings</h3>
+    <table class="table table-hover table-dark table-border table-responsive w-50">
+        <thead>
+            <td>#</td>
+            <td>Name</td>
+            <td>Score</td>
+        </thead>
+        <tbody>
+            <!-- TODO: fix standings to be sorted based on scores -->
+            for i, team := range teams {
+                <tr>
+                    <td>{ fmt.Sprintf("%d", (i*2)+1) }</td>
+                    <td>{ team.Player1 }</td>
+                    <td>{ fmt.Sprintf("%d", team.AllScores()) }</td>
+                </tr>
+                <tr>
+                    <td>{ fmt.Sprintf("%d", (i*2)+2) }</td>
+                    <td>{ team.Player2 }</td>
+                    <td>{ fmt.Sprintf("%d", team.AllScores()) }</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 }
 
 templ Bracket(round game.Round) {
 <div class="column">
     <h3>{ round.Name }</h3>
     for _, match := range round.Matches {
-    <table class="table table-hover table-dark table-border table-responsive">
+    <table class="table table-hover table-dark table-border table-responsive w-75">
         <tbody>
             for _, team := range match.Teams() {
             <tr>
                 <td>{ team.String() }</td>
                 <td>{ fmt.Sprintf("%d", team.Score()) }</td>
-                <td>actions</td>
+                if team.Player1 != game.TBD {
+                    <td>@InlineEditBtn("/fake-url")</td>
+                }
             </tr>
             }
         </tbody>
@@ -30,50 +83,4 @@ templ Bracket(round game.Round) {
 </div>
 }
 
-templ UsersForm() {
-<div class="column">
-    <form action="/users_list" method="POST">
-        <div class="form-outline mb-4">
-            <label for="playersListInput" class="form-label">Players List</label>
-            <textarea class="form-control" name="playersListInput" id="playersListInput" aria-describedby="playersListHelp" rows="12"></textarea>
-            <div id="playersListHelp" class="form-text">
-                Write each players name on a separate line starting from the strongest player
-                (at the top) and finishing with the least strong player on the last line.
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
-}
 
-templ Error(txt string) {
-<div class="column">
-    <div class="error">
-        <h4>Error</h4>
-        <p>{ txt }</p>
-    </div>
-</div>
-}
-
-templ Page(elements ...templ.Component) {
-    <!doctype html>
-	<html>
-		<head>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>Foosball Tournament</title>
-            <script src="/static/assets/htmx.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"/>
-            <link rel="stylesheet" type="text/css" href="/static/assets/styles.css"/>
-		</head>
-		<body class="bg-gray-100">
-			<h1 class="title text-center display-5 fw-bold py-5 my-5">Foosball Tournament</h1>
-            <div class="container">
-                for _, el := range elements {
-                    @el
-                }
-            </div>
-		</body>
-	</html>
-}

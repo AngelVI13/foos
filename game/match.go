@@ -10,6 +10,8 @@ const (
 	Empty Result = "n/a"
 )
 
+const TBD = "tbd"
+
 type Team struct {
 	Player1  string
 	Player2  string
@@ -30,6 +32,14 @@ func NewTeam(p1, p2 string) Team {
 
 func (m *Team) Score() int {
 	return m.scores[m.matchIdx]
+}
+
+func (m *Team) AllScores() int {
+	sum := 0
+	for _, score := range m.scores {
+		sum += score
+	}
+	return sum
 }
 
 func (m *Team) SetScore(v int) {
@@ -65,7 +75,7 @@ func NewMatch(t1, t2 *Team) Match {
 }
 
 func NewTbdMatch() Match {
-	emptyTeam := NewTeam("tbd", "tbd")
+	emptyTeam := NewTeam(TBD, TBD)
 	return Match{
 		team1: &emptyTeam,
 		team2: &emptyTeam,

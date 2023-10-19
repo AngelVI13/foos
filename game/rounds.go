@@ -87,3 +87,7 @@ func (r *Rounds) NextRound() {
 	r.All = allRounds
 	r.CurrentRound++
 }
+
+func (r *Rounds) ResultsTable() []*Team {
+	return nil
+}
