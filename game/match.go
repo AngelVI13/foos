@@ -5,8 +5,9 @@ import "fmt"
 type Result string
 
 const (
-	Win  Result = "win"
-	Loss Result = "loss"
+	Win   Result = "win"
+	Loss  Result = "loss"
+	Empty Result = "n/a"
 )
 
 type Team struct {
@@ -23,6 +24,7 @@ func NewTeam(p1, p2 string) Team {
 		Player2:  p2,
 		matchIdx: 0,
 		scores:   []int{0},
+		results:  []Result{Empty},
 	}
 }
 
@@ -40,6 +42,9 @@ func (m *Team) SetResult(v Result) {
 }
 
 func (m *Team) Result(matchIdx int) Result {
+	if matchIdx >= len(m.results) {
+		return Empty
+	}
 	return m.results[matchIdx]
 }
 
@@ -48,22 +53,30 @@ func (m Team) String() string {
 }
 
 type Match struct {
-	team1 Team
-	team2 Team
+	team1 *Team
+	team2 *Team
 }
 
-func NewMatch(t1, t2 Team) Match {
+func NewMatch(t1, t2 *Team) Match {
 	return Match{
 		team1: t1,
 		team2: t2,
 	}
 }
 
-func (m *Match) Teams() []Team {
-	return []Team{m.team1, m.team2}
+func NewTbdMatch() Match {
+	emptyTeam := NewTeam("tbd", "tbd")
+	return Match{
+		team1: &emptyTeam,
+		team2: &emptyTeam,
+	}
 }
 
-func (m *Match) Result() (winner Team, loser Team) {
+func (m *Match) Teams() []*Team {
+	return []*Team{m.team1, m.team2}
+}
+
+func (m *Match) Result() (winner *Team, loser *Team) {
 	if m.team1.Score() > m.team2.Score() {
 		m.team1.SetResult(Win)
 		m.team2.SetResult(Loss)
@@ -77,25 +90,4 @@ func (m *Match) Result() (winner Team, loser Team) {
 func (m *Match) AddScores(team1Score, team2Score int) {
 	m.team1.SetScore(team1Score)
 	m.team2.SetScore(team2Score)
-}
-
-func MatchesFromTeamsMap(teamsMap map[string]string) []Match {
-	var teams []Team
-	processedTeam := 0
-
-	var matches []Match
-
-	for p1, p2 := range teamsMap {
-		processedTeam++
-		teams = append(teams, NewTeam(p1, p2))
-
-		if processedTeam%2 == 0 {
-			matches = append(
-				matches,
-				NewMatch(teams[processedTeam-2], teams[processedTeam-1]),
-			)
-		}
-	}
-
-	return matches
 }

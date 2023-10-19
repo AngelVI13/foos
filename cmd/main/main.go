@@ -14,42 +14,20 @@ import (
 
 type GlobalState struct {
 	Players []string
-	Teams   []game.Team
-	Matches []game.Match
-	Round   int
-}
-
-func (s *GlobalState) GenerateMatches() {
-	var matches []game.Match
-	if s.Round == 0 {
-		for i := 2; i <= len(s.Teams); i += 2 {
-			matches = append(
-				matches,
-				game.NewMatch(s.Teams[i-2], s.Teams[i-1]),
-			)
-		}
-	} else {
-		panic("not implemented")
-	}
-
-	s.Matches = matches
+	Rounds  game.Rounds
 }
 
 func NewEmptyGlobalState() GlobalState {
 	return GlobalState{
 		Players: []string{},
-		Teams:   []game.Team{},
-		Matches: []game.Match{},
-		Round:   0,
+		Rounds:  game.Rounds{},
 	}
 }
 
 func NewGlobalState(players []string, teams []game.Team) GlobalState {
 	return GlobalState{
 		Players: players,
-		Teams:   teams,
-		Matches: []game.Match{},
-		Round:   0,
+		Rounds:  game.NewRounds(teams),
 	}
 }
 
@@ -92,8 +70,8 @@ func usersListHandler(c *gin.Context) {
 }
 
 func tournamentBracketHandler(c *gin.Context) {
-	state.GenerateMatches()
-	c.HTML(http.StatusOK, "", views.Page(views.Bracket(state.Matches)))
+	log.Info("", "rounds", state.Rounds)
+	c.HTML(http.StatusOK, "", views.Page(views.Rounds(state.Rounds)))
 }
 
 var log = slog.New(

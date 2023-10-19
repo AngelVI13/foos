@@ -5,9 +5,16 @@ import (
 	"github.com/AngelVI13/foos/game"
 )
 
-templ Bracket(matches []game.Match) {
+templ Rounds(rounds game.Rounds) {
+    for _, round := range rounds.All {
+        @Bracket(round)
+    }
+}
+
+templ Bracket(round game.Round) {
 <div class="column">
-    for _, match := range matches {
+    <h3>{ round.Name }</h3>
+    for _, match := range round.Matches {
     <table class="table table-hover table-dark table-border table-responsive">
         <tbody>
             for _, team := range match.Teams() {
