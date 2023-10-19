@@ -1,65 +1,51 @@
 package views
 
+import (
+    "fmt"
+	"github.com/AngelVI13/foos/game"
+)
 
-templ Bracket() {
+templ Bracket(matches []game.Match) {
 <div class="column">
-   <table class="table table-hover table-border table-responsive">
-      <thead>
-         <tr class="table-primary">
-            <th scope="col col-lg-6">Team</th>
-            <th scope="col col-sm-3">Score</th>
-            <th scope="col col-sm-3">Actions</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>Angel & Alina</td>
-            <td>10</td>
-            <td>actions</td>
-         </tr>
-         <tr>
-            <td>Ugnius & Vygintas</td>
-            <td>7</td>
-            <td>actions</td>
-         </tr>
-      </tbody>
-   </table>
-   <table class="table table-hover table-border table-responsive">
-      <thead>
-         <tr class="table-primary">
-            <th scope="col col-lg-6">Team</th>
-            <th scope="col col-sm-3">Score</th>
-            <th scope="col col-sm-3">Actions</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>Angel & Alina</td>
-            <td>10</td>
-            <td>actions</td>
-         </tr>
-         <tr>
-            <td>Ugnius & Vygintas</td>
-            <td>7</td>
-            <td>actions</td>
-         </tr>
-      </tbody>
-   </table>
+    for _, match := range matches {
+    <table class="table table-hover table-dark table-border table-responsive">
+        <tbody>
+            for _, team := range match.Teams() {
+            <tr>
+                <td>{ team.String() }</td>
+                <td>{ fmt.Sprintf("%d", team.Score()) }</td>
+                <td>actions</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
 </div>
 }
 
 templ UsersForm() {
-<form>
-  <div class="mb-3">
-    <label for="playerslistinput" class="form-label">Players List</label>
-    <textarea class="form-control" id="playerslistinput" aria-describedby="playersListHelp" rows="12"></textarea>
-    <div id="playersListHelp" class="form-text">
-    Write each players name on a separate line starting from the strongest player
-    (at the top) and finishing with the least strong player on the last line.
+<div class="column">
+    <form action="/users_list" method="POST">
+        <div class="form-outline mb-4">
+            <label for="playersListInput" class="form-label">Players List</label>
+            <textarea class="form-control" name="playersListInput" id="playersListInput" aria-describedby="playersListHelp" rows="12"></textarea>
+            <div id="playersListHelp" class="form-text">
+                Write each players name on a separate line starting from the strongest player
+                (at the top) and finishing with the least strong player on the last line.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+}
+
+templ Error(txt string) {
+<div class="column">
+    <div class="error">
+        <h4>Error</h4>
+        <p>{ txt }</p>
     </div>
-  </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>
 }
 
 templ Page(elements ...templ.Component) {
