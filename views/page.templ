@@ -1,5 +1,6 @@
 package views
 
+
 templ Error(txt string) {
 <div class="column">
     <div class="error">
@@ -24,6 +25,8 @@ templ Page(elements ...templ.Component) {
     <body class="bg-gray-100">
         <div class="background-img"></div>
         <div class="content">
+            <!-- <h1 class="title text-center display-5 fw-bold py-5"><a href={routes.IndexUrl}>Foosball Tournament</a></h1> -->
+            <!-- <h1 class="title text-center display-5 fw-bold py-5" hx-target="body" hx-swap="innerHtml" hx-trigger="click" hx-get={routes.IndexUrl}>Foosball Tournament</h1> -->
             <h1 class="title text-center display-5 fw-bold py-5">Foosball Tournament</h1>
             <div class="container py-5 my-5">
                 for _, el := range elements {
