@@ -3,23 +3,24 @@ package views
 import (
     "fmt"
 	"github.com/AngelVI13/foos/game"
+	"github.com/AngelVI13/foos/routes"
 )
 
 
 templ InlineEditBtn(url string) {
-<a class="m-1 link-warning" hx-get="{url}" hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML">
+<a class="m-1 link-warning" hx-get={url} hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML">
     @EditIcon()
 </a>
 }
 
 templ InlineSaveBtn(url string) {
-<a class="m-1 link-success" hx-put="{url}" hx-exc="json-enc" hx-trigger="click" hx-include="closest tr" hx-target="closest tr" hx-swap="outerHTML"> 
+<a class="m-1 link-success" hx-put={url} hx-exc="json-enc" hx-trigger="click" hx-include="closest tr" hx-target="closest tr" hx-swap="outerHTML"> 
     @ConfirmIcon()
 </a>
 }
 
 templ InlineCancelBtn(url string) {
-<a class="m-1 link-danger" hx-get="{url}" hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML">
+<a class="m-1 link-danger" hx-get={url} hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML">
     @CancelIcon()
 </a>
 }
@@ -33,6 +34,26 @@ templ Rounds(rounds game.Rounds) {
     @Standings(rounds.Teams)
 }
 
+templ TeamRow(team *game.Team, url string) {
+<tr>
+    <td>{ team.String() }</td>
+    <td>{ fmt.Sprintf("%d", team.Score()) }</td>
+    if team.Player1 != game.TBD {
+        <td>@InlineEditBtn(url)</td>
+    }
+</tr>
+}
+
+templ TeamRowUpdate(teamName, url string, value int) {
+<tr>
+    <td>{ teamName }</td>
+    <td> <input id="scoreUpdate" class="form-control" value={fmt.Sprint(value)} type="text" name="score" maxlength="2" size="2" /> </td>
+    <td>
+        @InlineSaveBtn(url)
+        @InlineCancelBtn(url)
+    </td>
+</tr>
+}
 
 templ Standings(teams []*game.Team) {
 <div class="column">
@@ -68,14 +89,8 @@ templ Bracket(round game.Round) {
     for _, match := range round.Matches {
     <table class="table table-hover table-dark table-border table-responsive w-75">
         <tbody>
-            for _, team := range match.Teams() {
-            <tr>
-                <td>{ team.String() }</td>
-                <td>{ fmt.Sprintf("%d", team.Score()) }</td>
-                if team.Player1 != game.TBD {
-                    <td>@InlineEditBtn("/fake-url")</td>
-                }
-            </tr>
+            for i, team := range match.Teams() {
+                @TeamRow(team, routes.MakeMatchUpdateUrl(&match, i+1))
             }
         </tbody>
     </table>

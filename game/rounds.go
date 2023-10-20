@@ -91,3 +91,14 @@ func (r *Rounds) NextRound() {
 func (r *Rounds) ResultsTable() []*Team {
 	return nil
 }
+
+func (r *Rounds) FindMatchById(id string) *Match {
+	for _, round := range r.All {
+		for _, match := range round.Matches {
+			if id == match.Id {
+				return &match
+			}
+		}
+	}
+	return nil
+}

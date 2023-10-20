@@ -3,10 +3,12 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/AngelVI13/foos/game"
 	"github.com/AngelVI13/foos/log"
+	"github.com/AngelVI13/foos/routes"
 	"github.com/AngelVI13/foos/views"
 	"github.com/gin-gonic/gin"
 )
@@ -80,10 +82,34 @@ func usersListHandler(c *gin.Context) {
 	log.L.Info("", "teams", teams)
 	state = NewGlobalState(players, teams)
 
-	c.Redirect(http.StatusFound, TournamentTableUrl)
+	c.Redirect(http.StatusFound, routes.TournamentTableUrl)
 }
 
 func tournamentBracketHandler(c *gin.Context) {
 	log.L.Info("", "rounds", state.Rounds)
 	c.HTML(http.StatusOK, "", views.Page(views.Rounds(state.Rounds)))
+}
+
+func tournamentBracketMatchUpdateHandler(c *gin.Context) {
+	match_id := c.Param("match_id")
+	team := c.Param("team")
+
+	if match_id == "" || team == "" {
+		errorHandler(c, fmt.Sprintf("Missing match_id or team: %s %s", match_id, team))
+		return
+	}
+
+	teamNum, err := strconv.Atoi(team)
+	if err != nil {
+		errorHandler(c, fmt.Sprintf("Failed to convert team to int: %s %v", team, err))
+		return
+	}
+
+	url := c.Request.URL.String()
+	log.L.Info("", "match_id", match_id, "team", teamNum, "url", url)
+
+	match := state.Rounds.FindMatchById(match_id)
+	teamPtr := match.Teams()[teamNum-1]
+
+	c.HTML(http.StatusOK, "", views.TeamRowUpdate(teamPtr.String(), url, teamPtr.Score()))
 }

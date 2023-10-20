@@ -5,8 +5,8 @@ go 1.21.0
 require (
 	github.com/a-h/templ v0.2.408
 	github.com/gin-gonic/gin v1.9.1
+	github.com/google/uuid v1.3.1
 	github.com/mroth/weightedrand/v2 v2.1.0
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 )
 
 require (

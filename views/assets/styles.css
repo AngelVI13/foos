@@ -69,6 +69,12 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(20, 25, 25, .8);
 }
 
+#scoreUpdate {
+    line-height: 1;
+    padding: 0;
+    text-align: center;
+}
+
 .info, .success, .warning, .error, .validation {
     border: 1px solid;
     margin: 10px 0px;

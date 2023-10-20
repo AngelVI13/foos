@@ -1,6 +1,10 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/google/uuid"
+)
 
 type Result string
 
@@ -63,12 +67,15 @@ func (m Team) String() string {
 }
 
 type Match struct {
+	Id    string
 	team1 *Team
 	team2 *Team
 }
 
 func NewMatch(t1, t2 *Team) Match {
+	id := uuid.New()
 	return Match{
+		Id:    id.String(),
 		team1: t1,
 		team2: t2,
 	}
@@ -76,10 +83,7 @@ func NewMatch(t1, t2 *Team) Match {
 
 func NewTbdMatch() Match {
 	emptyTeam := NewTeam(TBD, TBD)
-	return Match{
-		team1: &emptyTeam,
-		team2: &emptyTeam,
-	}
+	return NewMatch(&emptyTeam, &emptyTeam)
 }
 
 func (m *Match) Teams() []*Team {

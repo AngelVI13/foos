@@ -1,6 +1,8 @@
 package web
 
-import "github.com/AngelVI13/foos/game"
+import (
+	"github.com/AngelVI13/foos/game"
+)
 
 type GlobalState struct {
 	Players []string
