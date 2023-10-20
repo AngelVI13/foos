@@ -46,6 +46,13 @@ func usersListHandler(c *gin.Context) {
 	playersSplit := strings.Split(playersRawInput, "\r\n")
 	var players []string
 	for _, p := range playersSplit {
+		// remove X) preffix where X is a number
+		// i.e. 1) Ugnius
+		if strings.Count(p, ")") == 1 {
+			index := strings.Index(p, ")")
+			p = p[index+1:]
+		}
+
 		player := strings.TrimSpace(p)
 		if player == "" {
 			continue
