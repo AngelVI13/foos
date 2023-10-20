@@ -14,7 +14,7 @@ templ InlineEditBtn(url string) {
 }
 
 templ InlineSaveBtn(url string) {
-<a class="m-1 link-success" hx-put={url} hx-exc="json-enc" hx-trigger="click" hx-include="closest tr" hx-target="closest tr" hx-swap="outerHTML"> 
+<a class="m-1 link-success" hx-post={url} hx-trigger="click" hx-include="closest tr" hx-target="closest tr" hx-swap="outerHTML"> 
     @ConfirmIcon()
 </a>
 }
@@ -37,7 +37,7 @@ templ Rounds(rounds game.Rounds) {
 templ TeamRow(team *game.Team, url string) {
 <tr>
     <td>{ team.String() }</td>
-    <td>{ fmt.Sprintf("%d", team.Score()) }</td>
+    <td id="score">{ fmt.Sprintf("%d", team.Score()) }</td>
     if team.Player1 != game.TBD {
         <td>@InlineEditBtn(url)</td>
     }

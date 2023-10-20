@@ -47,12 +47,17 @@ func (m *Team) AllScores() int {
 }
 
 func (m *Team) SetScore(v int) {
-	m.matchIdx = len(m.scores)
-	m.scores = append(m.scores, v)
+	m.scores[m.matchIdx] = v
 }
 
 func (m *Team) SetResult(v Result) {
-	m.results = append(m.results, v)
+	m.results[m.matchIdx] = v
+}
+
+func (m *Team) MatchDone() {
+	m.matchIdx++
+	m.scores = append(m.scores, 0)
+	m.results = append(m.results, Empty)
 }
 
 func (m *Team) Result(matchIdx int) Result {
@@ -98,10 +103,9 @@ func (m *Match) Result() (winner *Team, loser *Team) {
 	}
 	m.team1.SetResult(Loss)
 	m.team2.SetResult(Win)
-	return m.team2, m.team1
-}
 
-func (m *Match) AddScores(team1Score, team2Score int) {
-	m.team1.SetScore(team1Score)
-	m.team2.SetScore(team2Score)
+	m.team1.MatchDone()
+	m.team2.MatchDone()
+
+	return m.team2, m.team1
 }

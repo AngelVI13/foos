@@ -90,26 +90,61 @@ func tournamentBracketHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "", views.Page(views.Rounds(state.Rounds)))
 }
 
-func tournamentBracketMatchUpdateHandler(c *gin.Context) {
+func getMatchInfoFromRequest(c *gin.Context) (*game.Match, *game.Team, int, error) {
 	match_id := c.Param("match_id")
 	team := c.Param("team")
 
 	if match_id == "" || team == "" {
-		errorHandler(c, fmt.Sprintf("Missing match_id or team: %s %s", match_id, team))
-		return
+		return nil, nil, -1, fmt.Errorf("missing match_id or team: %s %s", match_id, team)
 	}
 
 	teamNum, err := strconv.Atoi(team)
 	if err != nil {
-		errorHandler(c, fmt.Sprintf("Failed to convert team to int: %s %v", team, err))
-		return
+		return nil, nil, -1, fmt.Errorf(
+			"failed to convert team to int: %s %v",
+			team,
+			err,
+		)
 	}
-
-	url := c.Request.URL.String()
-	log.L.Info("", "match_id", match_id, "team", teamNum, "url", url)
 
 	match := state.Rounds.FindMatchById(match_id)
 	teamPtr := match.Teams()[teamNum-1]
+	return match, teamPtr, teamNum, nil
+}
 
-	c.HTML(http.StatusOK, "", views.TeamRowUpdate(teamPtr.String(), url, teamPtr.Score()))
+func tournamentBracketMatchUpdateHandler(c *gin.Context) {
+	match, teamPtr, teamNum, err := getMatchInfoFromRequest(c)
+	if err != nil {
+		errorHandler(c, err.Error())
+		return
+	}
+	url := routes.MakeMatchShowUrl(match, teamNum)
+
+	c.HTML(
+		http.StatusOK,
+		"",
+		views.TeamRowUpdate(teamPtr.String(), url, teamPtr.Score()),
+	)
+}
+
+func tournamentBracketMatchShowHandler(c *gin.Context) {
+	match, teamPtr, teamNum, err := getMatchInfoFromRequest(c)
+	if err != nil {
+		errorHandler(c, err.Error())
+		return
+	}
+
+	if c.Request.Method == http.MethodPost {
+		scoreStr := c.PostForm("score")
+		score, err := strconv.Atoi(scoreStr)
+		if err != nil {
+			errorHandler(c, fmt.Sprintf("Score is not an integer: %q: %v", scoreStr, err))
+			return
+		}
+		teamPtr.SetScore(score)
+	}
+
+	editUrl := routes.MakeMatchUpdateUrl(match, teamNum)
+
+	c.HTML(http.StatusOK, "", views.TeamRow(teamPtr, editUrl))
 }
