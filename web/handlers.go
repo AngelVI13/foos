@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -84,7 +85,14 @@ func usersListHandler(c *gin.Context) {
 }
 
 func tournamentBracketHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "", views.Page(views.Rounds(state.Rounds)))
+	var teamsCopy []*game.Team
+	teamsCopy = append(teamsCopy, state.Rounds.Teams...)
+
+	sort.Slice(teamsCopy, func(i, j int) bool {
+		return teamsCopy[i].AllScores() > teamsCopy[j].AllScores()
+	})
+
+	c.HTML(http.StatusOK, "", views.Page(views.Rounds(state.Rounds, teamsCopy)))
 }
 
 func getMatchInfoFromRequest(c *gin.Context) (*game.Match, *game.Team, int, error) {

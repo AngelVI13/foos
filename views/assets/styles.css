@@ -70,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .winner > td {
-    background-color: forestgreen;
+    background-color: darkgreen;
 }
 
 #score {

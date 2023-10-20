@@ -26,12 +26,12 @@ templ InlineCancelBtn(url string) {
 }
 
 
-templ Rounds(rounds game.Rounds) {
+templ Rounds(rounds game.Rounds, standings []*game.Team) {
     for _, round := range rounds.All {
         @Bracket(round, rounds.CurrentRound)
     }
 
-    @Standings(rounds.Teams)
+    @Standings(standings)
 }
 
 templ TeamRow(team *game.Team, url string, round int) {
@@ -58,14 +58,13 @@ templ TeamRowUpdate(teamName, url string, value int) {
 templ Standings(teams []*game.Team) {
 <div class="column">
     <h3>Standings</h3>
-    <table class="table table-hover table-dark table-border table-responsive w-50">
+    <table class="table table-hover table-dark table-border table-responsive w-75">
         <thead>
             <td>#</td>
             <td>Name</td>
             <td>Score</td>
         </thead>
         <tbody>
-            <!-- TODO: fix standings to be sorted based on scores -->
             for i, team := range teams {
                 <tr>
                     <td>{ fmt.Sprintf("%d", (i*2)+1) }</td>
