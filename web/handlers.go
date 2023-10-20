@@ -19,9 +19,8 @@ func indexHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "", views.Page(views.UsersForm()))
 }
 
-func usersListHandler(c *gin.Context) {
-	playersRawInput := c.PostForm("playersListInput")
-	playersSplit := strings.Split(playersRawInput, "\r\n")
+func parsePlayersInput(playersInput string) []string {
+	playersSplit := strings.Split(playersInput, "\r\n")
 	var players []string
 	for _, p := range playersSplit {
 		// remove X) preffix where X is a number
@@ -31,6 +30,10 @@ func usersListHandler(c *gin.Context) {
 			p = p[index+1:]
 		}
 
+		if strings.HasPrefix(p, "-") {
+			p = strings.ReplaceAll(p, "-", "")
+		}
+
 		player := strings.TrimSpace(p)
 		if player == "" {
 			continue
@@ -38,8 +41,34 @@ func usersListHandler(c *gin.Context) {
 		players = append(players, player)
 	}
 
+	return players
+}
+
+func findDuplicates(values []string) []string {
+	seen := map[string]bool{}
+	var duplicates []string
+	for _, v := range values {
+		if _, found := seen[v]; found {
+			duplicates = append(duplicates, v)
+		} else {
+			seen[v] = true
+		}
+	}
+	return duplicates
+}
+
+func usersListHandler(c *gin.Context) {
+	playersRawInput := c.PostForm("playersListInput")
+	players := parsePlayersInput(playersRawInput)
+
 	if !(len(players) == 8 || len(players) == 12) {
-		errorHandler(c, fmt.Sprintf("Expected 8 or 12 playes but got %d", len(players)))
+		errorHandler(c, fmt.Sprintf("Expected 8 or 12 players but got %d", len(players)))
+		return
+	}
+
+	duplicates := findDuplicates(players)
+	if len(duplicates) > 0 {
+		errorHandler(c, fmt.Sprintf("Found duplicate players: %v", duplicates))
 		return
 	}
 
