@@ -4,14 +4,14 @@ templ UsersForm() {
 <div class="column">
     <form action="/users_list" method="POST">
         <div class="form-outline mb-4">
-            <label for="playersListInput" class="form-label">Players List</label>
+            <label id="playersListLabel" for="playersListInput" class="form-label">Players List</label>
             <textarea class="form-control" name="playersListInput" id="playersListInput" aria-describedby="playersListHelp" rows="12"></textarea>
             <div id="playersListHelp" class="form-text">
                 Write each players name on a separate line starting from the strongest player
                 (at the top) and finishing with the least strong player on the last line.
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-dark">Submit</button>
     </form>
 </div>
 }
