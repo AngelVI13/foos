@@ -3,9 +3,9 @@ package game
 import (
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"os"
 
+	"github.com/AngelVI13/foos/log"
 	"github.com/mroth/weightedrand/v2"
 )
 
@@ -39,7 +39,6 @@ func loadTeamsFromFile(name string) map[string]string {
 func generateTeams(
 	players []string,
 	prevTeams1, prevTeams2 map[string]string,
-	log *slog.Logger,
 ) map[string]string {
 	teams := map[string]string{}
 
@@ -48,8 +47,8 @@ func generateTeams(
 		player, players = playersPop(players)
 		prevPartner1 := prevTeams1[player]
 		prevPartner2 := prevTeams2[player]
-		log.Info(fmt.Sprintf("Selecting partner for %s\n", player))
-		log.Info(fmt.Sprintf("Last partners: %s %s\n", prevPartner1, prevPartner2))
+		log.L.Info(fmt.Sprintf("Selecting partner for %s\n", player))
+		log.L.Info(fmt.Sprintf("Last partners: %s %s\n", prevPartner1, prevPartner2))
 
 		var choices []weightedrand.Choice[string, int]
 		for i, p := range players {
@@ -61,7 +60,7 @@ func generateTeams(
 			}
 		}
 
-		log.Info("", "Probabilities:", choices)
+		log.L.Info("", "Probabilities:", choices)
 		chooser, err := weightedrand.NewChooser(choices...)
 		if err != nil {
 			panic(err)
@@ -69,7 +68,7 @@ func generateTeams(
 		result := chooser.Pick()
 		players = playersRemove(players, result)
 
-		log.Info("", player, result)
+		log.L.Info("", player, result)
 		teams[player] = result
 	}
 	return teams
@@ -89,14 +88,14 @@ const (
     `
 )
 
-func GenerateTeams(players []string, log *slog.Logger) ([]Team, error) {
+func GenerateTeams(players []string) ([]Team, error) {
 	prevTeams1 := loadTeamsFromFile(teamsFile1)
 	prevTeams2 := loadTeamsFromFile(teamsFile2)
-	log.Info("", "Previous Teams1:", prevTeams1)
-	log.Info("", "Previous Teams2:", prevTeams2)
+	log.L.Info("", "Previous Teams1:", prevTeams1)
+	log.L.Info("", "Previous Teams2:", prevTeams2)
 
-	teamsMap := generateTeams(players, prevTeams1, prevTeams2, log)
-	log.Info("", "Teams:", teamsMap)
+	teamsMap := generateTeams(players, prevTeams1, prevTeams2)
+	log.L.Info("", "Teams:", teamsMap)
 
 	err := saveTeamsToFile(teamsMap, teamsFile1, teamsFile2)
 	if err != nil {
