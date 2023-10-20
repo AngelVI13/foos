@@ -80,7 +80,7 @@ func NewRounds(teams []Team) Rounds {
 
 func (r *Rounds) NextRound() {
 	var allRounds []Round
-	for i := 0; i < len(r.Teams)/4; i++ {
+	for i := 0; i <= len(r.Teams)/4; i++ {
 		allRounds = append(allRounds, NewRound(i, r.Teams))
 	}
 

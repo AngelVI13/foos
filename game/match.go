@@ -38,6 +38,17 @@ func (m *Team) Score() int {
 	return m.scores[m.matchIdx]
 }
 
+func (m *Team) ScoreForMatch(matchIdx int) int {
+	if matchIdx > m.matchIdx {
+		return 0
+	}
+	return m.scores[matchIdx]
+}
+
+func (m *Team) CurrentMatch() int {
+	return m.matchIdx
+}
+
 func (m *Team) AllScores() int {
 	sum := 0
 	for _, score := range m.scores {
@@ -95,17 +106,15 @@ func (m *Match) Teams() []*Team {
 	return []*Team{m.team1, m.team2}
 }
 
-func (m *Match) Result() (winner *Team, loser *Team) {
+func (m *Match) End() {
 	if m.team1.Score() > m.team2.Score() {
 		m.team1.SetResult(Win)
 		m.team2.SetResult(Loss)
-		return m.team1, m.team2
+	} else {
+		m.team1.SetResult(Loss)
+		m.team2.SetResult(Win)
 	}
-	m.team1.SetResult(Loss)
-	m.team2.SetResult(Win)
 
 	m.team1.MatchDone()
 	m.team2.MatchDone()
-
-	return m.team2, m.team1
 }

@@ -8,11 +8,12 @@ import (
 )
 
 const (
-	IndexUrl                 = "/"
-	UsersListUrl             = "/users_list"
-	TournamentTableUrl       = "/tournament_table"
-	TournamentTableUpdateUrl = "/tournament_table/:match_id/:team/update"
-	TournamentTableShowUrl   = "/tournament_table/:match_id/:team/show"
+	IndexUrl                   = "/"
+	UsersListUrl               = "/users_list"
+	TournamentTableUrl         = "/tournament_table"
+	TournamentTableUpdateUrl   = "/tournament_table/:match_id/:team/update"
+	TournamentTableShowUrl     = "/tournament_table/:match_id/:team/show"
+	TournamentTableEndRoundUrl = "/tournament_table/round/end"
 )
 
 func RouteWithParam(route, name, value string) string {

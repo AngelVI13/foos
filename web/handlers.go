@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/AngelVI13/foos/game"
-	"github.com/AngelVI13/foos/log"
 	"github.com/AngelVI13/foos/routes"
 	"github.com/AngelVI13/foos/views"
 	"github.com/gin-gonic/gin"
@@ -79,14 +78,12 @@ func usersListHandler(c *gin.Context) {
 		errorHandler(c, fmt.Sprintf("Failed to generate teams: %v", err))
 		return
 	}
-	log.L.Info("", "teams", teams)
 	state = NewGlobalState(players, teams)
 
 	c.Redirect(http.StatusFound, routes.TournamentTableUrl)
 }
 
 func tournamentBracketHandler(c *gin.Context) {
-	log.L.Info("", "rounds", state.Rounds)
 	c.HTML(http.StatusOK, "", views.Page(views.Rounds(state.Rounds)))
 }
 
@@ -146,5 +143,34 @@ func tournamentBracketMatchShowHandler(c *gin.Context) {
 
 	editUrl := routes.MakeMatchUpdateUrl(match, teamNum)
 
-	c.HTML(http.StatusOK, "", views.TeamRow(teamPtr, editUrl))
+	c.HTML(http.StatusOK, "", views.TeamRow(teamPtr, editUrl, state.Rounds.CurrentRound))
+}
+
+func tournamentBracketEndRoundHandler(c *gin.Context) {
+	currentRound := state.Rounds.All[state.Rounds.CurrentRound]
+
+	// Check if all matches ended i.e. one team has more points than the other
+	endedMatches := 0
+	for _, match := range currentRound.Matches {
+		teams := match.Teams()
+		team1 := teams[0]
+		team2 := teams[1]
+
+		if team1.Score() != team2.Score() {
+			endedMatches++
+		}
+	}
+
+	if endedMatches != len(currentRound.Matches) {
+		errorHandler(c, fmt.Sprintf("%d matches not finished", endedMatches))
+		return
+	}
+
+	for _, match := range currentRound.Matches {
+		match.End()
+	}
+
+	state.Rounds.NextRound()
+
+	c.Redirect(http.StatusFound, routes.TournamentTableUrl)
 }
