@@ -28,7 +28,7 @@ templ Page(elements ...templ.Component) {
             <!-- <h1 class="title text-center display-5 fw-bold py-5"><a href={routes.IndexUrl}>Foosball Tournament</a></h1> -->
             <!-- <h1 class="title text-center display-5 fw-bold py-5" hx-target="body" hx-swap="innerHtml" hx-trigger="click" hx-get={routes.IndexUrl}>Foosball Tournament</h1> -->
             <h1 class="title text-center display-5 fw-bold py-5">Foosball Tournament</h1>
-            <div class="container py-5 my-5">
+            <div class="container py-2 my-1">
                 for _, el := range elements {
                     @el
                 }

@@ -57,6 +57,26 @@ func (m *Team) AllScores() int {
 	return sum
 }
 
+func (m *Team) Wins() int {
+	num := 0
+	for _, result := range m.results {
+		if result == Win {
+			num++
+		}
+	}
+	return num
+}
+
+func (m *Team) Losses() int {
+	num := 0
+	for _, result := range m.results {
+		if result == Loss {
+			num++
+		}
+	}
+	return num
+}
+
 func (m *Team) SetScore(v int) {
 	m.scores[m.matchIdx] = v
 }

@@ -25,8 +25,19 @@ templ InlineCancelBtn(url string) {
 </a>
 }
 
+templ Menu() {
+<div class="column">
+    <div class="menu w-75">
+        <h3>Menu</h3>
+        <a href={routes.IndexUrl} class="btn btn-dark">Generate Teams and Start New Tournament</a>
+        <a href={routes.IndexUrl} class="btn btn-dark">Enter New Players</a>
+    </div>
+</div>
+}
 
 templ Rounds(rounds game.Rounds, standings []*game.Team) {
+    @Menu()
+
     for _, round := range rounds.All {
         @Bracket(round, rounds.CurrentRound)
     }
@@ -59,23 +70,29 @@ templ TeamRowUpdate(teamName, url string, value int) {
 templ Standings(teams []*game.Team) {
 <div class="column">
     <h3>Standings</h3>
-    <table class="table table-hover table-dark table-border table-responsive w-75">
+    <table class="table table-hover table-dark table-border table-responsive">
         <thead>
             <td>#</td>
             <td>Name</td>
-            <td>Score</td>
+            <td class="tcenter">Score</td>
+            <td class="tcenter">Wins</td>
+            <td class="tcenter">Losses</td>
         </thead>
         <tbody>
             for i, team := range teams {
                 <tr>
                     <td>{ fmt.Sprintf("%d", (i*2)+1) }</td>
                     <td>{ team.Player1 }</td>
-                    <td>{ fmt.Sprintf("%d", team.AllScores()) }</td>
+                    <td class="tcenter">{ fmt.Sprintf("%d", team.AllScores()) }</td>
+                    <td class="tcenter">{ fmt.Sprintf("%d", team.Wins()) }</td>
+                    <td class="tcenter">{ fmt.Sprintf("%d", team.Losses()) }</td>
                 </tr>
                 <tr>
                     <td>{ fmt.Sprintf("%d", (i*2)+2) }</td>
                     <td>{ team.Player2 }</td>
-                    <td>{ fmt.Sprintf("%d", team.AllScores()) }</td>
+                    <td class="tcenter">{ fmt.Sprintf("%d", team.AllScores()) }</td>
+                    <td class="tcenter">{ fmt.Sprintf("%d", team.Wins()) }</td>
+                    <td class="tcenter">{ fmt.Sprintf("%d", team.Losses()) }</td>
                 </tr>
             }
         </tbody>
@@ -100,7 +117,7 @@ templ Bracket(round game.Round, currentRound int) {
         }
     }
     if round.Id == currentRound {
-    <a href={routes.TournamentTableEndRoundUrl} class="btn btn-dark">End Round</a>
+    <a href={routes.TournamentTableEndRoundUrl} class="btn btn-warning">End Round</a>
     }
 </div>
 }
