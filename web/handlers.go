@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -60,6 +61,12 @@ func findDuplicates(values []string) []string {
 }
 
 func usersListHandler(c *gin.Context) {
+	deletePrevTeams := c.PostForm("deletePrevTeams")
+	if deletePrevTeams == "on" {
+		os.Remove(game.TeamsFile1)
+		os.Remove(game.TeamsFile2)
+	}
+
 	playersRawInput := c.PostForm("playersListInput")
 	players := parsePlayersInput(playersRawInput)
 

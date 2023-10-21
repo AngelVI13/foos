@@ -76,8 +76,8 @@ func generateTeams(
 
 const (
 	playersFile     = "players.txt"
-	teamsFile1      = "teams1.json"
-	teamsFile2      = "teams2.json"
+	TeamsFile1      = "teams1.json"
+	TeamsFile2      = "teams2.json"
 	playersErrorTxt = `
 
     couldn't process players file.
@@ -89,15 +89,15 @@ const (
 )
 
 func GenerateTeams(players []string) ([]Team, error) {
-	prevTeams1 := loadTeamsFromFile(teamsFile1)
-	prevTeams2 := loadTeamsFromFile(teamsFile2)
+	prevTeams1 := loadTeamsFromFile(TeamsFile1)
+	prevTeams2 := loadTeamsFromFile(TeamsFile2)
 	log.L.Info("", "Previous Teams1:", prevTeams1)
 	log.L.Info("", "Previous Teams2:", prevTeams2)
 
 	teamsMap := generateTeams(players, prevTeams1, prevTeams2)
 	log.L.Info("", "Teams:", teamsMap)
 
-	err := saveTeamsToFile(teamsMap, teamsFile1, teamsFile2)
+	err := saveTeamsToFile(teamsMap, TeamsFile1, TeamsFile2)
 	if err != nil {
 		return nil, err
 	}
