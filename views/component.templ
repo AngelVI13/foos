@@ -29,7 +29,7 @@ templ Menu() {
 <div class="column">
     <div class="menu w-75">
         <h3>Menu</h3>
-        <a href={routes.IndexUrl} class="btn btn-dark">Generate Teams and Start New Tournament</a>
+        <a href={routes.NewTournamentUrl} class="btn btn-dark">Generate Teams and Start New Tournament</a>
         <a href={routes.IndexUrl} class="btn btn-dark">Enter New Players</a>
     </div>
 </div>
@@ -104,7 +104,7 @@ templ Bracket(round game.Round, currentRound int) {
 <div class="column">
     <h3>{ round.Name }</h3>
     for i, match := range round.Matches {
-        <table class="table table-hover table-dark table-border table-responsive w-75">
+        <table class="table table-hover table-dark table-border table-responsive">
             <tbody>
                 for i, team := range match.Teams() {
                     @TeamRow(team, routes.MakeMatchUpdateUrl(&match, i+1), round.Id)

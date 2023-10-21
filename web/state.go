@@ -16,11 +16,16 @@ func NewEmptyGlobalState() GlobalState {
 	}
 }
 
-func NewGlobalState(players []string, teams []game.Team) GlobalState {
+func NewGlobalState(players []string) (GlobalState, error) {
+	teams, err := game.GenerateTeams(players)
+	if err != nil {
+		return NewEmptyGlobalState(), err
+	}
+
 	return GlobalState{
 		Players: players,
 		Rounds:  game.NewRounds(teams),
-	}
+	}, nil
 }
 
 // global state for the app

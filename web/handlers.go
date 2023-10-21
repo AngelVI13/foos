@@ -74,12 +74,12 @@ func usersListHandler(c *gin.Context) {
 		return
 	}
 
-	teams, err := game.GenerateTeams(players)
+	var err error
+	state, err = NewGlobalState(players)
 	if err != nil {
 		errorHandler(c, fmt.Sprintf("Failed to generate teams: %v", err))
 		return
 	}
-	state = NewGlobalState(players, teams)
 
 	c.Redirect(http.StatusFound, routes.TournamentTableUrl)
 }
@@ -179,6 +179,17 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 	}
 
 	state.Rounds.NextRound()
+
+	c.Redirect(http.StatusFound, routes.TournamentTableUrl)
+}
+
+func newTournamentHandler(c *gin.Context) {
+	var err error
+	state, err = NewGlobalState(state.Players)
+	if err != nil {
+		errorHandler(c, fmt.Sprintf("Failed to generate teams: %v", err))
+		return
+	}
 
 	c.Redirect(http.StatusFound, routes.TournamentTableUrl)
 }

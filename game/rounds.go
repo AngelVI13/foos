@@ -67,8 +67,12 @@ func NewRounds(teams []Team) Rounds {
 	}
 
 	var allRounds []Round
-	for i := 0; i <= len(teams)/4; i++ {
-		allRounds = append(allRounds, NewRound(i, teamPtrs))
+	if len(teams) == 4 {
+		for i := 0; i <= len(teams)/4; i++ {
+			allRounds = append(allRounds, NewRound(i, teamPtrs))
+		}
+	} else {
+		allRounds = append(allRounds, NewRound(0, teamPtrs))
 	}
 
 	return Rounds{

@@ -14,6 +14,7 @@ const (
 	TournamentTableUpdateUrl   = "/tournament_table/:match_id/:team/update"
 	TournamentTableShowUrl     = "/tournament_table/:match_id/:team/show"
 	TournamentTableEndRoundUrl = "/tournament_table/round/end"
+	NewTournamentUrl           = "/tournament_table/new"
 )
 
 func RouteWithParam(route, name, value string) string {

@@ -18,4 +18,5 @@ func SetupRoutes(r *gin.Engine) {
 	r.GET(routes.TournamentTableShowUrl, tournamentBracketMatchShowHandler)
 	r.POST(routes.TournamentTableShowUrl, tournamentBracketMatchShowHandler)
 	r.GET(routes.TournamentTableEndRoundUrl, tournamentBracketEndRoundHandler)
+	r.GET(routes.NewTournamentUrl, newTournamentHandler)
 }
