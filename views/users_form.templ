@@ -11,9 +11,11 @@ templ UsersForm() {
                 (at the top) and finishing with the least strong player on the last line.
             </div>
 
-            <div class="mb-3 form-check">
+            <div class="input-group mb-1">
                 <input type="checkbox" class="form-check-input" id="deletePrevTeams" name="deletePrevTeams"/>
-                <label class="form-check-label" for="deletePrevTeams" id="deletePrevTeamsLabel">Delete Old Team Files</label>
+                <label class="form-check-label px-2" for="deletePrevTeams" id="deletePrevTeamsLabel">Delete Old Team Files </label>
+                <input type="checkbox" class="form-check-input" id="resetSeasonStats" name="resetSeasonStats"/>
+                <label class="form-check-label px-2" for="resetSeasonStats" id="resetSeasonStatsLabel">Reset Season Stats</label>
             </div>
         </div>
         <button type="submit" class="btn btn-dark">Submit</button>

@@ -35,7 +35,7 @@ templ Menu() {
 </div>
 }
 
-templ Rounds(rounds game.Rounds, standings []*game.Team) {
+templ Rounds(rounds game.Rounds, standings []*game.Team, stats []*game.Stats) {
     @Menu()
 
     for _, round := range rounds.All {
@@ -43,7 +43,7 @@ templ Rounds(rounds game.Rounds, standings []*game.Team) {
     }
 
     @Standings(standings)
-    <!-- <a href={routes.IndexUrl} class="btn btn-dark">New Tournament</a> -->
+    @AllTimeStats(stats)
 }
 
 templ TeamRow(team *game.Team, url string, round int) {
@@ -93,6 +93,32 @@ templ Standings(teams []*game.Team) {
                     <td class="tcenter">{ fmt.Sprintf("%d", team.AllScores()) }</td>
                     <td class="tcenter">{ fmt.Sprintf("%d", team.Wins()) }</td>
                     <td class="tcenter">{ fmt.Sprintf("%d", team.Losses()) }</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}
+
+templ AllTimeStats(stats []*game.Stats) {
+<div class="column">
+    <h3>All-Time</h3>
+    <table class="table table-hover table-dark table-border table-responsive">
+        <thead>
+            <td>#</td>
+            <td>Name</td>
+            <td class="tcenter">Score</td>
+            <td class="tcenter">Wins</td>
+            <td class="tcenter">Losses</td>
+        </thead>
+        <tbody>
+            for i, stat := range stats {
+                <tr>
+                    <td>{ fmt.Sprintf("%d", i+1) }</td>
+                    <td>{ stat.Player }</td>
+                    <td class="tcenter">{ fmt.Sprint(stat.Score) }</td>
+                    <td class="tcenter">{ fmt.Sprint(stat.Won) }</td>
+                    <td class="tcenter">{ fmt.Sprint(stat.Lost) }</td>
                 </tr>
             }
         </tbody>

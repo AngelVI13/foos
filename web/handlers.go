@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/AngelVI13/foos/game"
+	"github.com/AngelVI13/foos/log"
 	"github.com/AngelVI13/foos/routes"
 	"github.com/AngelVI13/foos/views"
 	"github.com/gin-gonic/gin"
@@ -67,6 +68,11 @@ func usersListHandler(c *gin.Context) {
 		os.Remove(game.TeamsFile2)
 	}
 
+	resetSeasonStats := c.PostForm("resetSeasonStats")
+	if resetSeasonStats == "on" {
+		os.Remove(game.StatsFile)
+	}
+
 	playersRawInput := c.PostForm("playersListInput")
 	players := parsePlayersInput(playersRawInput)
 
@@ -99,7 +105,23 @@ func tournamentBracketHandler(c *gin.Context) {
 		return teamsCopy[i].AllScores() > teamsCopy[j].AllScores()
 	})
 
-	c.HTML(http.StatusOK, "", views.Page(views.Rounds(state.Rounds, teamsCopy)))
+	var statsCopy []*game.Stats
+	for _, s := range state.Stats {
+		statsCopy = append(statsCopy, s)
+	}
+
+	sort.Slice(statsCopy, func(i, j int) bool {
+		if statsCopy[i].Score == statsCopy[j].Score {
+			return statsCopy[i].Won > statsCopy[j].Won
+		}
+		return statsCopy[i].Score > statsCopy[j].Score
+	})
+
+	c.HTML(
+		http.StatusOK,
+		"",
+		views.Page(views.Rounds(state.Rounds, teamsCopy, statsCopy)),
+	)
 }
 
 func getMatchInfoFromRequest(c *gin.Context) (*game.Match, *game.Team, int, error) {
@@ -171,9 +193,11 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 		team1 := teams[0]
 		team2 := teams[1]
 
-		if team1.Score() != team2.Score() {
-			endedMatches++
+		if team1.Score() == team2.Score() {
+			continue
 		}
+
+		endedMatches++
 	}
 
 	if endedMatches != len(currentRound.Matches) {
@@ -181,9 +205,22 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 		return
 	}
 
+	// Update all time stats
 	for _, match := range currentRound.Matches {
-		match.End()
+		stats := match.End()
+
+		for player := range stats {
+			if _, found := state.Stats[player]; found {
+				state.Stats[player].Score += stats[player].Score
+				state.Stats[player].Won += stats[player].Won
+				state.Stats[player].Lost += stats[player].Lost
+			} else {
+				state.Stats[player] = stats[player]
+			}
+		}
 	}
+	err := game.SaveStats(state.Stats)
+	log.L.Error("failed to update all time stats", "err", err)
 
 	state.Rounds.NextRound()
 

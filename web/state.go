@@ -7,6 +7,7 @@ import (
 type GlobalState struct {
 	Players []string
 	Rounds  game.Rounds
+	Stats   map[string]*game.Stats
 }
 
 func NewEmptyGlobalState() GlobalState {
@@ -22,9 +23,12 @@ func NewGlobalState(players []string) (GlobalState, error) {
 		return NewEmptyGlobalState(), err
 	}
 
+	stats := game.LoadStats()
+
 	return GlobalState{
 		Players: players,
 		Rounds:  game.NewRounds(teams),
+		Stats:   stats,
 	}, nil
 }
 

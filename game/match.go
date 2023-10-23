@@ -126,7 +126,9 @@ func (m *Match) Teams() []*Team {
 	return []*Team{m.team1, m.team2}
 }
 
-func (m *Match) End() {
+func (m *Match) End() map[string]*Stats {
+	stats := map[string]*Stats{}
+
 	if m.team1.Score() > m.team2.Score() {
 		m.team1.SetResult(Win)
 		m.team2.SetResult(Loss)
@@ -135,6 +137,22 @@ func (m *Match) End() {
 		m.team2.SetResult(Win)
 	}
 
+	for _, team := range []*Team{m.team1, m.team2} {
+		for _, player := range []string{team.Player1, team.Player2} {
+			stats[player] = &Stats{}
+			stats[player].Player = player
+			stats[player].Score = team.Score()
+
+			if team.Result(team.CurrentMatch()) == Win {
+				stats[player].Won++
+			} else {
+				stats[player].Lost++
+			}
+		}
+	}
+
 	m.team1.MatchDone()
 	m.team2.MatchDone()
+
+	return stats
 }
