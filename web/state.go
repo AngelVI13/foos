@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/AngelVI13/foos/game"
+	"github.com/AngelVI13/foos/log"
 )
 
 type GlobalState struct {
@@ -18,12 +19,19 @@ func NewEmptyGlobalState() GlobalState {
 }
 
 func NewGlobalState(players []string) (GlobalState, error) {
+	stats := game.LoadStats()
+	log.L.Info("stats", "len", len(stats))
+	for _, s := range stats {
+		log.L.Info("", "p", s.Player, "s", game.PlayerSuccess(s))
+	}
+	log.L.Info("", "players before", players)
+	players = game.PlayersByStats(players, stats)
+	log.L.Info("", "players after", players)
+
 	teams, err := game.GenerateTeams(players)
 	if err != nil {
 		return NewEmptyGlobalState(), err
 	}
-
-	stats := game.LoadStats()
 
 	return GlobalState{
 		Players: players,

@@ -64,12 +64,14 @@ func findDuplicates(values []string) []string {
 func usersListHandler(c *gin.Context) {
 	deletePrevTeams := c.PostForm("deletePrevTeams")
 	if deletePrevTeams == "on" {
+		log.L.Info("deleting teams")
 		os.Remove(game.TeamsFile1)
 		os.Remove(game.TeamsFile2)
 	}
 
 	resetSeasonStats := c.PostForm("resetSeasonStats")
 	if resetSeasonStats == "on" {
+		log.L.Info("deleting season stats")
 		os.Remove(game.StatsFile)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/AngelVI13/foos/log"
 	"github.com/mroth/weightedrand/v2"
@@ -88,6 +89,33 @@ const (
     `
 )
 
+func PlayersByStats(players []string, stats map[string]*Stats) []string {
+	if len(stats) == 0 {
+		return players
+	}
+	sort.Slice(players, func(i, j int) bool {
+		player1Stat, player1Found := stats[players[i]]
+		player2Stat, player2Found := stats[players[j]]
+		if !player1Found && !player2Found {
+			return true
+		} else if player1Found && !player2Found {
+			return true
+		} else if !player1Found && player2Found {
+			return false
+		}
+
+		return PlayerSuccess(player1Stat) > PlayerSuccess(player2Stat)
+	})
+	return players
+}
+
+// PlayerSuccess calculate as percentage of score per match
+func PlayerSuccess(player *Stats) int {
+	// 10 is maximum number of points per match
+	return int(100 * (float64(player.Score) / float64(10.0*(player.Won+player.Lost))))
+}
+
+// GenerateTeams Generates weighted random teams based on order of playes (best to worst)
 func GenerateTeams(players []string) ([]Team, error) {
 	prevTeams1 := loadTeamsFromFile(TeamsFile1)
 	prevTeams2 := loadTeamsFromFile(TeamsFile2)
