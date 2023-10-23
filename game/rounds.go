@@ -89,6 +89,11 @@ func NewRounds(teams []Team) Rounds {
 }
 
 func (r *Rounds) NextRound() {
+	if (r.CurrentRound + 1) >= len(r.All) {
+		r.CurrentRound++
+		return
+	}
+
 	var allRounds []Round
 	maxRounds := len(r.Teams)/4 + 1
 	for i := 0; i < maxRounds; i++ {
