@@ -11,7 +11,7 @@ type Round struct {
 	Matches []Match
 }
 
-func NewRound(id int, teams []*Team) Round {
+func NewRound(id int, teams []*Team, maxRounds int) Round {
 	var matches []Match
 	if id == 0 {
 		for i := 2; i <= len(teams); i += 2 {
@@ -47,9 +47,13 @@ func NewRound(id int, teams []*Team) Round {
 		}
 	}
 
+	roundName := RoundNames[id]
+	if id == 0 && maxRounds == 1 {
+		roundName = "Matches"
+	}
 	return Round{
 		Id:      id,
-		Name:    RoundNames[id],
+		Name:    roundName,
 		Matches: matches,
 	}
 }
@@ -68,11 +72,13 @@ func NewRounds(teams []Team) Rounds {
 
 	var allRounds []Round
 	if len(teams) == 4 {
-		for i := 0; i <= len(teams)/4; i++ {
-			allRounds = append(allRounds, NewRound(i, teamPtrs))
+		maxRounds := len(teams)/4 + 1
+		for i := 0; i < maxRounds; i++ {
+			allRounds = append(allRounds, NewRound(i, teamPtrs, maxRounds))
 		}
 	} else {
-		allRounds = append(allRounds, NewRound(0, teamPtrs))
+		maxRounds := 1
+		allRounds = append(allRounds, NewRound(0, teamPtrs, maxRounds))
 	}
 
 	return Rounds{
@@ -84,8 +90,9 @@ func NewRounds(teams []Team) Rounds {
 
 func (r *Rounds) NextRound() {
 	var allRounds []Round
-	for i := 0; i <= len(r.Teams)/4; i++ {
-		allRounds = append(allRounds, NewRound(i, r.Teams))
+	maxRounds := len(r.Teams)/4 + 1
+	for i := 0; i < maxRounds; i++ {
+		allRounds = append(allRounds, NewRound(i, r.Teams, maxRounds))
 	}
 
 	r.All = allRounds
