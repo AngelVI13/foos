@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -90,7 +89,7 @@ func usersListHandler(c *gin.Context) {
 	}
 
 	var err error
-	state, err = NewGlobalState(players)
+	state, err = NewGlobalState(players, state.CurrentStandings)
 	if err != nil {
 		errorHandler(c, fmt.Sprintf("Failed to generate teams: %v", err))
 		return
@@ -100,29 +99,13 @@ func usersListHandler(c *gin.Context) {
 }
 
 func tournamentBracketHandler(c *gin.Context) {
-	var teamsCopy []*game.Team
-	teamsCopy = append(teamsCopy, state.Rounds.Teams...)
-
-	sort.Slice(teamsCopy, func(i, j int) bool {
-		return teamsCopy[i].AllScores() > teamsCopy[j].AllScores()
-	})
-
-	var statsCopy []*game.Stats
-	for _, s := range state.Stats {
-		statsCopy = append(statsCopy, s)
-	}
-
-	sort.Slice(statsCopy, func(i, j int) bool {
-		if statsCopy[i].Score == statsCopy[j].Score {
-			return statsCopy[i].Won > statsCopy[j].Won
-		}
-		return statsCopy[i].Score > statsCopy[j].Score
-	})
+	currentStats := game.OrderedStatsSlice(state.CurrentStandings)
+	overallStats := game.OrderedStatsSlice(state.Stats)
 
 	c.HTML(
 		http.StatusOK,
 		"",
-		views.Page(views.Rounds(state.Rounds, teamsCopy, statsCopy)),
+		views.Page(views.Rounds(state.Rounds, currentStats, overallStats)),
 	)
 }
 
@@ -210,6 +193,8 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 	// Update all time stats
 	for _, match := range currentRound.Matches {
 		stats := match.End()
+		log.L.Error("", "stats", state.Stats)
+		log.L.Error("", "currentStandings", state.CurrentStandings)
 
 		for player := range stats {
 			if _, found := state.Stats[player]; found {
@@ -218,6 +203,14 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 				state.Stats[player].Lost += stats[player].Lost
 			} else {
 				state.Stats[player] = stats[player]
+			}
+
+			if _, found := state.CurrentStandings[player]; found {
+				state.CurrentStandings[player].Score += stats[player].Score
+				state.CurrentStandings[player].Won += stats[player].Won
+				state.CurrentStandings[player].Lost += stats[player].Lost
+			} else {
+				state.CurrentStandings[player] = stats[player]
 			}
 		}
 	}
@@ -231,7 +224,7 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 
 func newTournamentHandler(c *gin.Context) {
 	var err error
-	state, err = NewGlobalState(state.Players)
+	state, err = NewGlobalState(state.Players, state.CurrentStandings)
 	if err != nil {
 		errorHandler(c, fmt.Sprintf("Failed to generate teams: %v", err))
 		return

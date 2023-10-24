@@ -104,15 +104,9 @@ func PlayersByStats(players []string, stats map[string]*Stats) []string {
 			return false
 		}
 
-		return PlayerSuccess(player1Stat) > PlayerSuccess(player2Stat)
+		return player1Stat.SuccessRate() > player2Stat.SuccessRate()
 	})
 	return players
-}
-
-// PlayerSuccess calculate as percentage of score per match
-func PlayerSuccess(player *Stats) int {
-	// 10 is maximum number of points per match
-	return int(100 * (float64(player.Score) / float64(10.0*(player.Won+player.Lost))))
 }
 
 // GenerateTeams Generates weighted random teams based on order of playes (best to worst)

@@ -6,23 +6,29 @@ import (
 )
 
 type GlobalState struct {
-	Players []string
-	Rounds  game.Rounds
-	Stats   map[string]*game.Stats
+	Players          []string
+	Rounds           game.Rounds
+	Stats            map[string]*game.Stats
+	CurrentStandings map[string]*game.Stats
 }
 
 func NewEmptyGlobalState() GlobalState {
 	return GlobalState{
-		Players: []string{},
-		Rounds:  game.Rounds{},
+		Players:          []string{},
+		Rounds:           game.Rounds{},
+		Stats:            make(map[string]*game.Stats),
+		CurrentStandings: make(map[string]*game.Stats),
 	}
 }
 
-func NewGlobalState(players []string) (GlobalState, error) {
+func NewGlobalState(
+	players []string,
+	currentStandings map[string]*game.Stats,
+) (GlobalState, error) {
 	stats := game.LoadStats()
 	log.L.Info("stats", "len", len(stats))
 	for _, s := range stats {
-		log.L.Info("", "p", s.Player, "s", game.PlayerSuccess(s))
+		log.L.Info("", "p", s.Player, "s", s.SuccessRate())
 	}
 	log.L.Info("", "players before", players)
 	players = game.PlayersByStats(players, stats)
@@ -34,9 +40,10 @@ func NewGlobalState(players []string) (GlobalState, error) {
 	}
 
 	return GlobalState{
-		Players: players,
-		Rounds:  game.NewRounds(teams),
-		Stats:   stats,
+		Players:          players,
+		Rounds:           game.NewRounds(teams),
+		Stats:            stats,
+		CurrentStandings: currentStandings,
 	}, nil
 }
 
