@@ -1,0 +1,51 @@
+package views
+
+templ Timer() {
+<script>
+    var countDownTimerId = undefined;
+
+    function reset_timer() {
+        if (countDownTimerId === undefined) {
+            return;
+        }
+        window.clearInterval(countDownTimerId);
+
+        var el = document.querySelector('.timer-txt');
+        el.textContent = "10m 00s";
+
+        var startBtn = document.querySelector('.timer-start');
+        startBtn.disabled = false;
+    }
+
+    function start_timer() {
+        var timer = 10 * 60;
+        var audio = new Audio('/static/assets/sounds/beep-warning-6387.mp3');
+        var startBtn = document.querySelector('.timer-start');
+        startBtn.disabled = true;
+
+        countDownTimerId = setInterval(function () {
+            if (--timer <= 0) {
+                audio.play();
+                reset_timer();
+                return;
+            }
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            var el = document.querySelector('.timer-txt');
+            el.textContent = minutes + "m " + seconds + "s";
+        }, 1000);
+    }
+</script>
+<form class="timer my-4">
+    <h3 class="timer-txt">10m 00s</h3>
+    <div class="input-group mb-3">
+        <button type="button" class="timer-start btn btn-dark" hx-trigger="click[start_timer()]">Start</button>
+        <button type="reset" class="btn btn-warning" hx-trigger="click[reset_timer()]">Reset</button>
+    </div>
+</form>
+}
+
