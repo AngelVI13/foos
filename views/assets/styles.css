@@ -22,6 +22,9 @@ html {
     -o-filter: blur(5px);
     -ms-filter: blur(5px);
     filter: blur(5px);
+
+    /* remove white border around the blur */
+    transform: scale(1.1);
 }
 
 .content {
