@@ -48,23 +48,20 @@ templ Rounds(rounds game.Rounds, standings []*game.Team, stats []*game.Stats) {
 }
 
 templ TeamRow(team *game.Team, url string, round int) {
-<tr class={templ.KV("winner", team.Result(round) == game.Win) }>
+<tr class={templ.KV("winner", team.Result(round) == game.Win) }
+    if team.CurrentMatch() == round {
+        hx-get={url} hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML"
+    }
+    >
     <td>{ team.String() }</td>
     <td id="score">{ fmt.Sprintf("%d", team.ScoreForMatch(round)) }</td>
-    if team.CurrentMatch() == round {
-        <td>@InlineEditBtn(url)</td>
-    }
 </tr>
 }
 
 templ TeamRowUpdate(teamName, url string, value int) {
-<tr>
+<tr hx-post={url} hx-trigger="keyup[keyCode==13] from:body" hx-include="closest tr" hx-target="closest tr" hx-swap="outerHTML">
     <td>{ teamName }</td>
     <td> <input id="scoreUpdate" class="form-control" value={fmt.Sprint(value)} type="text" name="score" maxlength="2" size="2" /> </td>
-    <td>
-        @InlineSaveBtn(url)
-        @InlineCancelBtn(url)
-    </td>
 </tr>
 }
 
@@ -131,7 +128,7 @@ templ Bracket(round game.Round, currentRound int) {
 <div class="column">
     <h3>{ round.Name }</h3>
     for i, match := range round.Matches {
-        <table class="table table-hover table-dark table-border table-responsive">
+        <table class="table table-hover table-dark table-border table-responsive w-75">
             <tbody>
                 for i, team := range match.Teams() {
                     @TeamRow(team, routes.MakeMatchUpdateUrl(&match, i+1), round.Id)
@@ -144,7 +141,8 @@ templ Bracket(round game.Round, currentRound int) {
         }
     }
     if round.Id == currentRound {
-    <a href={routes.TournamentTableEndRoundUrl} class="btn btn-warning">End Round</a>
+    <span class="info-span w-75">Click on a row to edit scores & press enter to save.</span>
+    <a href={routes.TournamentTableEndRoundUrl} class="end-round btn btn-warning">End Round</a>
     }
 </div>
 }
