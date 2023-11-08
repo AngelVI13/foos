@@ -19,18 +19,29 @@ templ Timer() {
 
     function start_timer() {
         var timer = 10 * 60;
-        var audio = new Audio('/static/assets/sounds/beep-warning-6387.mp3');
+        var beep = new Audio('/static/assets/sounds/beep-warning-6387.mp3');
         var startBtn = document.querySelector('.timer-start');
         startBtn.disabled = true;
 
+        const minuteSounds = new Set();
+
+        var start = new Audio('/static/assets/sounds/start-13691.mp3');
+        start.play();
+
         countDownTimerId = setInterval(function () {
-            if (--timer <= 0) {
-                audio.play();
+            if (--timer <= 1) {
+                beep.play();
                 reset_timer();
                 return;
             }
             minutes = parseInt(timer / 60, 10);
             seconds = parseInt(timer % 60, 10);
+
+            if (!minuteSounds.has(minutes) && seconds === 0) {
+                var minSound = new Audio('/static/assets/sounds/numbers/' + minutes + '.wav');
+                minSound.play();
+                minuteSounds.add(minutes);
+            }
 
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
