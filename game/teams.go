@@ -109,6 +109,20 @@ func PlayersByStats(players []string, stats map[string]*Stats) []string {
 	return players
 }
 
+// TeamsByStats Reorder teams so that 1st player does not play with 2nd player (based on overall stats)
+func TeamsByStats(teams []Team) []Team {
+	var newTeams []Team
+	numMatches := len(teams) / 2
+	i := 0
+	for i < numMatches {
+		newTeams = append(newTeams, teams[i])
+		newTeams = append(newTeams, teams[i+numMatches])
+		i++
+	}
+
+	return newTeams
+}
+
 // GenerateTeams Generates weighted random teams based on order of playes (best to worst)
 func GenerateTeams(players []string) ([]Team, error) {
 	prevTeams1 := loadTeamsFromFile(TeamsFile1)

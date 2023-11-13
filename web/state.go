@@ -38,6 +38,9 @@ func NewGlobalState(
 	if err != nil {
 		return NewEmptyGlobalState(), err
 	}
+	log.L.Info("", "team before", teams)
+	teams = game.TeamsByStats(teams)
+	log.L.Info("", "team after", teams)
 
 	return GlobalState{
 		Players:          players,
