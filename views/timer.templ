@@ -25,7 +25,7 @@ templ Timer() {
 
         const minuteSounds = new Set();
 
-        var start = new Audio('/static/assets/sounds/start-13691.mp3');
+        var start = new Audio('/static/assets/sounds/timer_started.wav');
         start.play();
 
         countDownTimerId = setInterval(function () {
@@ -38,7 +38,7 @@ templ Timer() {
             seconds = parseInt(timer % 60, 10);
 
             if (!minuteSounds.has(minutes) && seconds === 0) {
-                var minSound = new Audio('/static/assets/sounds/numbers/' + minutes + '.wav');
+                var minSound = new Audio('/static/assets/sounds/numbers/' + minutes + '_minutes.wav');
                 minSound.play();
                 minuteSounds.add(minutes);
             }
