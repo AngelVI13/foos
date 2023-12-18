@@ -10,6 +10,7 @@ type GlobalState struct {
 	Rounds           game.Rounds
 	Stats            map[string]*game.Stats
 	CurrentStandings map[string]*game.Stats
+	JudgementDay     bool
 }
 
 func NewEmptyGlobalState() GlobalState {
@@ -18,12 +19,14 @@ func NewEmptyGlobalState() GlobalState {
 		Rounds:           game.Rounds{},
 		Stats:            make(map[string]*game.Stats),
 		CurrentStandings: make(map[string]*game.Stats),
+		JudgementDay:     false,
 	}
 }
 
 func NewGlobalState(
 	players []string,
 	currentStandings map[string]*game.Stats,
+	judgementDay bool,
 ) (GlobalState, error) {
 	stats := game.LoadStats()
 	log.L.Info("stats", "len", len(stats))
@@ -34,7 +37,9 @@ func NewGlobalState(
 	players = game.PlayersByStats(players, stats)
 	log.L.Info("", "players after", players)
 
-	teams, err := game.GenerateTeams(players)
+	playersRankings := game.PlayersRankings(stats)
+
+	teams, err := game.GenerateTeams(players, judgementDay, playersRankings)
 	if err != nil {
 		return NewEmptyGlobalState(), err
 	}
@@ -47,6 +52,7 @@ func NewGlobalState(
 		Rounds:           game.NewRounds(teams),
 		Stats:            stats,
 		CurrentStandings: currentStandings,
+		JudgementDay:     judgementDay,
 	}, nil
 }
 

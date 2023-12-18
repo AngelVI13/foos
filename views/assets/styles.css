@@ -55,6 +55,12 @@ h1, h2, h3, h4, h5, h6 {
     gap: 2em;
 }
 
+.judgement-day-title {
+    font-family: 'Doom 2016 Left', sans-serfi;
+    color: #880808;
+    text-decoration-line: overline;
+}
+
 .table {
     margin-top: 2em;
     margin-bottom: 1em;
@@ -78,7 +84,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 }
 
-#playersListLabel, #playersListHelp, #deletePrevTeamsLabel, #resetSeasonStatsLabel {
+#playersListLabel, #playersListHelp, #deletePrevTeamsLabel, #resetSeasonStatsLabel, #enableJudgementDayLabel {
     color: white;
 }
 

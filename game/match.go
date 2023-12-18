@@ -17,20 +17,24 @@ const (
 const TBD = "tbd"
 
 type Team struct {
-	Player1  string
-	Player2  string
-	matchIdx int
-	scores   []int
-	results  []Result
+	Player1     string
+	Player2     string
+	Player1Rank int
+	Player2Rank int
+	matchIdx    int
+	scores      []int
+	results     []Result
 }
 
-func NewTeam(p1, p2 string) Team {
+func NewTeam(p1, p2 string, p1Rank, p2Rank int) Team {
 	return Team{
-		Player1:  p1,
-		Player2:  p2,
-		matchIdx: 0,
-		scores:   []int{0},
-		results:  []Result{Empty},
+		Player1:     p1,
+		Player2:     p2,
+		Player1Rank: p1Rank,
+		Player2Rank: p2Rank,
+		matchIdx:    0,
+		scores:      []int{0},
+		results:     []Result{Empty},
 	}
 }
 
@@ -99,7 +103,11 @@ func (m *Team) Result(matchIdx int) Result {
 }
 
 func (m Team) String() string {
-	return fmt.Sprintf("%s & %s", m.Player1, m.Player2)
+	if m.Player1Rank == -1 {
+		return fmt.Sprintf("%s & %s", m.Player1, m.Player2)
+	} else {
+		return fmt.Sprintf("%s (%d) & %s (%d)", m.Player1, m.Player1Rank, m.Player2, m.Player2Rank)
+	}
 }
 
 type Match struct {
@@ -118,7 +126,7 @@ func NewMatch(t1, t2 *Team) Match {
 }
 
 func NewTbdMatch() Match {
-	emptyTeam := NewTeam(TBD, TBD)
+	emptyTeam := NewTeam(TBD, TBD, -1, -1)
 	return NewMatch(&emptyTeam, &emptyTeam)
 }
 

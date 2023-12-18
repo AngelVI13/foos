@@ -54,6 +54,54 @@ func loadTeamsFromFile(name string) rawTeams {
 	return teams
 }
 
+func generateJudgementDayTeams(
+	players []string,
+	prevTeams1, prevTeams2 rawTeams,
+) [][2]string {
+	teams := [][2]string{} // use this in order to keep teams order
+	for len(teams) < len(players)/2 {
+		teams = append(teams, [2]string{})
+	}
+	log.L.Info("", "teams", teams)
+	currentTeamIndex := 0
+	totalPlayers := len(players)
+
+	var player string
+	for len(players) > 1 {
+		player, players = playersPop(players)
+		prevPartner1 := prevTeams1.Partner(player)
+		prevPartner2 := prevTeams2.Partner(player)
+		log.L.Info(fmt.Sprintf("Selecting partner for %s\n", player))
+		log.L.Info(fmt.Sprintf("Last partners: %s %s\n", prevPartner1, prevPartner2))
+
+		var choices []weightedrand.Choice[string, int]
+		for i, p := range players {
+			if p == prevPartner1 || p == prevPartner2 ||
+				(i+totalPlayers-len(players) < (totalPlayers/2)+currentTeamIndex) {
+				// no probability to be selected
+				// in case of judgement day -> no top half players can be paired
+				// with each other in a team
+				choices = append(choices, weightedrand.NewChoice(p, 0))
+			} else {
+				choices = append(choices, weightedrand.NewChoice(p, i+1))
+			}
+		}
+
+		log.L.Info("", "Probabilities:", choices)
+		chooser, err := weightedrand.NewChooser(choices...)
+		if err != nil {
+			panic(err)
+		}
+		result := chooser.Pick()
+		players = playersRemove(players, result)
+
+		teams[currentTeamIndex][0] = player
+		teams[currentTeamIndex][1] = result
+		currentTeamIndex++
+	}
+	return teams
+}
+
 func generateTeams(
 	players []string,
 	prevTeams1, prevTeams2 rawTeams,
@@ -132,6 +180,34 @@ func PlayersByStats(players []string, stats map[string]*Stats) []string {
 	return players
 }
 
+func PlayersRankings(stats map[string]*Stats) map[string]int {
+	var allPlayers []string
+
+	for player := range stats {
+		allPlayers = append(allPlayers, player)
+	}
+
+	sort.Slice(allPlayers, func(i, j int) bool {
+		player1Stat, player1Found := stats[allPlayers[i]]
+		player2Stat, player2Found := stats[allPlayers[j]]
+		if !player1Found && !player2Found {
+			return true
+		} else if player1Found && !player2Found {
+			return true
+		} else if !player1Found && player2Found {
+			return false
+		}
+
+		return player1Stat.SuccessRate() > player2Stat.SuccessRate()
+	})
+
+	rankings := map[string]int{}
+	for i, player := range allPlayers {
+		rankings[player] = i + 1
+	}
+	return rankings
+}
+
 // TeamsByStats Reorder teams so that 1st player does not play with 2nd player (based on overall stats)
 func TeamsByStats(teams []Team) []Team {
 	var newTeams []Team
@@ -147,13 +223,22 @@ func TeamsByStats(teams []Team) []Team {
 }
 
 // GenerateTeams Generates weighted random teams based on order of playes (best to worst)
-func GenerateTeams(players []string) ([]Team, error) {
+func GenerateTeams(
+	players []string,
+	judgementDay bool,
+	playersRankings map[string]int,
+) ([]Team, error) {
 	prevTeams1 := loadTeamsFromFile(TeamsFile1)
 	prevTeams2 := loadTeamsFromFile(TeamsFile2)
 	log.L.Info("", "Previous Teams1:", prevTeams1)
 	log.L.Info("", "Previous Teams2:", prevTeams2)
 
-	teamsSlice := generateTeams(players, prevTeams1, prevTeams2)
+	var teamsSlice [][2]string
+	if judgementDay {
+		teamsSlice = generateJudgementDayTeams(players, prevTeams1, prevTeams2)
+	} else {
+		teamsSlice = generateTeams(players, prevTeams1, prevTeams2)
+	}
 	log.L.Info("", "Teams:", teamsSlice)
 
 	err := saveTeamsToFile(teamsSlice, TeamsFile1, TeamsFile2)
@@ -163,7 +248,13 @@ func GenerateTeams(players []string) ([]Team, error) {
 
 	var teams []Team
 	for _, players := range teamsSlice {
-		teams = append(teams, NewTeam(players[0], players[1]))
+		player1Rank := -1
+		player2Rank := -1
+		if judgementDay {
+			player1Rank = playersRankings[players[0]]
+			player2Rank = playersRankings[players[1]]
+		}
+		teams = append(teams, NewTeam(players[0], players[1], player1Rank, player2Rank))
 	}
 
 	return teams, nil

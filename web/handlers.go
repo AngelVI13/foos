@@ -15,11 +15,11 @@ import (
 )
 
 func errorHandler(c *gin.Context, msg string) {
-	c.HTML(http.StatusOK, "", views.Page(views.Error(msg)))
+	c.HTML(http.StatusOK, "", views.Page(state.JudgementDay, views.Error(msg)))
 }
 
 func indexHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "", views.Page(views.UsersForm()))
+	c.HTML(http.StatusOK, "", views.Page(state.JudgementDay, views.UsersForm()))
 }
 
 func parsePlayersInput(playersInput string) []string {
@@ -61,8 +61,14 @@ func findDuplicates(values []string) []string {
 }
 
 func usersListHandler(c *gin.Context) {
+	enableJudgementDay := c.PostForm("enableJudgementDay") == "on"
+	if enableJudgementDay {
+		// NOTE: this forces deleting previous teams
+		log.L.Info("enabling judgement day pairings")
+	}
+
 	deletePrevTeams := c.PostForm("deletePrevTeams")
-	if deletePrevTeams == "on" {
+	if deletePrevTeams == "on" || enableJudgementDay {
 		log.L.Info("deleting teams")
 		os.Remove(game.TeamsFile1)
 		os.Remove(game.TeamsFile2)
@@ -89,7 +95,7 @@ func usersListHandler(c *gin.Context) {
 	}
 
 	var err error
-	state, err = NewGlobalState(players, state.CurrentStandings)
+	state, err = NewGlobalState(players, state.CurrentStandings, enableJudgementDay)
 	if err != nil {
 		errorHandler(c, fmt.Sprintf("Failed to generate teams: %v", err))
 		return
@@ -105,7 +111,10 @@ func tournamentBracketHandler(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"",
-		views.Page(views.Rounds(state.Rounds, currentStats, overallStats)),
+		views.Page(
+			state.JudgementDay,
+			views.Rounds(state.Rounds, currentStats, overallStats),
+		),
 	)
 }
 
@@ -224,7 +233,7 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 
 func newTournamentHandler(c *gin.Context) {
 	var err error
-	state, err = NewGlobalState(state.Players, state.CurrentStandings)
+	state, err = NewGlobalState(state.Players, state.CurrentStandings, state.JudgementDay)
 	if err != nil {
 		errorHandler(c, fmt.Sprintf("Failed to generate teams: %v", err))
 		return
