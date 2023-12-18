@@ -68,9 +68,19 @@ templ TeamRow(team *game.Team, url string, round int) {
 </tr>
 }
 
-templ TeamRowUpdate(teamName, url string, value int) {
+templ TeamRowUpdate(team *game.Team, url string, value int) {
 <tr hx-post={url} hx-trigger="keyup[keyCode==13] from:body" hx-include="closest tr" hx-target="closest tr" hx-swap="outerHTML">
-    <td>{ teamName }</td>
+    <td>
+        <span> { team.Player1 } </span>
+        if team.Player1Rank != -1 {
+            <span class={"numberCircle", fmt.Sprintf("current-%s", team.Player1RankClass()) }>{ fmt.Sprint(team.Player1Rank) }</span>
+        }
+        <span>{" & "}</span>
+        <span> { team.Player2 } </span>
+        if team.Player2Rank != -1 {
+            <span class={"numberCircle", fmt.Sprintf("current-%s", team.Player2RankClass()) }>{ fmt.Sprint(team.Player2Rank) }</span>
+        }
+    </td>
     <td> <input id="scoreUpdate" class="form-control" value={fmt.Sprint(value)} type="text" name="score" maxlength="2" size="2" /> </td>
 </tr>
 }

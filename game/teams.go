@@ -54,6 +54,16 @@ func loadTeamsFromFile(name string) rawTeams {
 	return teams
 }
 
+func numChoices(choices []weightedrand.Choice[string, int]) int {
+	choiceNum := 0
+	for _, c := range choices {
+		if c.Weight > 0 {
+			choiceNum++
+		}
+	}
+	return choiceNum
+}
+
 func generateJudgementDayTeams(
 	players []string,
 	prevTeams1, prevTeams2 rawTeams,
@@ -76,13 +86,19 @@ func generateJudgementDayTeams(
 
 		var choices []weightedrand.Choice[string, int]
 		for i, p := range players {
-			if p == prevPartner1 || p == prevPartner2 ||
-				(i+totalPlayers-len(players) < (totalPlayers/2)+currentTeamIndex) {
-				// no probability to be selected
+			if i+totalPlayers-len(players) < (totalPlayers/2)+currentTeamIndex {
 				// in case of judgement day -> no top half players can be paired
 				// with each other in a team
 				choices = append(choices, weightedrand.NewChoice(p, 0))
+			} else if (i == len(players)-1) && numChoices(choices) == 0 {
+				// if we are at the last element and currently no choices are added
+				// to list of players -> add the last player with 100%
+				choices = append(choices, weightedrand.NewChoice(p, i+1))
+			} else if p == prevPartner1 || p == prevPartner2 {
+				// skip previous partners
+				choices = append(choices, weightedrand.NewChoice(p, 0))
 			} else {
+				// for any other case add players with increasing weighted choice probability
 				choices = append(choices, weightedrand.NewChoice(p, i+1))
 			}
 		}

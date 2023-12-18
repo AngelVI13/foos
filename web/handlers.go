@@ -151,7 +151,7 @@ func tournamentBracketMatchUpdateHandler(c *gin.Context) {
 	c.HTML(
 		http.StatusOK,
 		"",
-		views.TeamRowUpdate(teamPtr.String(), url, teamPtr.Score()),
+		views.TeamRowUpdate(teamPtr, url, teamPtr.Score()),
 	)
 }
 
@@ -224,7 +224,15 @@ func tournamentBracketEndRoundHandler(c *gin.Context) {
 		}
 	}
 	err := game.SaveStats(state.Stats)
-	log.L.Error("failed to update all time stats", "err", err)
+	if err != nil {
+		log.L.Error("failed to update all time stats", "err", err)
+	}
+
+	newPlayerRankings := game.PlayersRankings(state.Stats)
+	for _, t := range state.Rounds.Teams {
+		t.Player1Rank = newPlayerRankings[t.Player1]
+		t.Player2Rank = newPlayerRankings[t.Player2]
+	}
 
 	state.Rounds.NextRound()
 
