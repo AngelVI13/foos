@@ -139,7 +139,11 @@ func generateTeams(
 
 		var choices []weightedrand.Choice[string, int]
 		for i, p := range players {
-			if p == prevPartner1 || p == prevPartner2 {
+			if (i == len(players)-1) && numChoices(choices) == 0 {
+				// if we are at the last element and currently no choices are added
+				// to list of players -> add the last player with 100%
+				choices = append(choices, weightedrand.NewChoice(p, i+1))
+			} else if p == prevPartner1 || p == prevPartner2 {
 				// no probability to be selected
 				choices = append(choices, weightedrand.NewChoice(p, 0))
 			} else {
@@ -264,12 +268,8 @@ func GenerateTeams(
 
 	var teams []Team
 	for _, players := range teamsSlice {
-		player1Rank := -1
-		player2Rank := -1
-		if judgementDay {
-			player1Rank = playersRankings[players[0]]
-			player2Rank = playersRankings[players[1]]
-		}
+		player1Rank := playersRankings[players[0]]
+		player2Rank := playersRankings[players[1]]
 		teams = append(teams, NewTeam(players[0], players[1], player1Rank, player2Rank))
 	}
 
