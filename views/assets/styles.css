@@ -143,3 +143,48 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #FFCCBA;
     background-image: url('https://i.imgur.com/GnyDvKN.png');
 }
+
+/* --- */
+.numberCircle {
+  display: inline-block;
+  border-radius: 50%;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.numberCircle:before,
+.numberCircle:after {
+  content: '\200B';
+  display: inline-block;
+  line-height: 0px;
+  padding-top: 50%;
+  padding-bottom: 50%;
+}
+
+.numberCircle:before {
+  padding-left: 5px;
+}
+
+.numberCircle:after {
+  padding-right: 5px;
+}
+
+.current-gold {
+    color: gold;
+}
+
+.current-silver {
+    color: white;
+}
+
+.current-bronze {
+    color: #cd7f32;
+}
+
+.current-fourth {
+    color: aqua;
+}
+
+.current-{
+    color: darkgray;
+}

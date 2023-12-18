@@ -53,7 +53,17 @@ templ TeamRow(team *game.Team, url string, round int) {
         hx-get={url} hx-trigger="click" hx-target="closest tr" hx-swap="outerHTML"
     }
     >
-    <td>{ team.String() }</td>
+    <td>
+        <span> { team.Player1 } </span>
+        if team.Player1Rank != -1 {
+            <span class={"numberCircle", fmt.Sprintf("current-%s", team.Player1RankClass()) }>{ fmt.Sprint(team.Player1Rank) }</span>
+        }
+        <span>{" & "}</span>
+        <span> { team.Player2 } </span>
+        if team.Player2Rank != -1 {
+            <span class={"numberCircle", fmt.Sprintf("current-%s", team.Player2RankClass()) }>{ fmt.Sprint(team.Player2Rank) }</span>
+        }
+    </td>
     <td id="score">{ fmt.Sprintf("%d", team.ScoreForMatch(round)) }</td>
 </tr>
 }

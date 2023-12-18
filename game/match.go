@@ -102,11 +102,30 @@ func (m *Team) Result(matchIdx int) Result {
 	return m.results[matchIdx]
 }
 
+func (m *Team) Player1RankClass() string {
+	return rankClass(m.Player1Rank)
+}
+
+func (m *Team) Player2RankClass() string {
+	return rankClass(m.Player2Rank)
+}
+
 func (m Team) String() string {
-	if m.Player1Rank == -1 {
-		return fmt.Sprintf("%s & %s", m.Player1, m.Player2)
-	} else {
-		return fmt.Sprintf("%s (%d) & %s (%d)", m.Player1, m.Player1Rank, m.Player2, m.Player2Rank)
+	return fmt.Sprintf("%s & %s", m.Player1, m.Player2)
+}
+
+func rankClass(rank int) string {
+	switch rank {
+	case 1:
+		return "gold"
+	case 2:
+		return "silver"
+	case 3:
+		return "bronze"
+	case 4:
+		return "fourth"
+	default:
+		return ""
 	}
 }
 
