@@ -267,9 +267,18 @@ func GenerateTeams(
 	}
 
 	var teams []Team
+	lastRank := len(playersRankings) + 1
 	for _, players := range teamsSlice {
-		player1Rank := playersRankings[players[0]]
-		player2Rank := playersRankings[players[1]]
+		player1Rank, found := playersRankings[players[0]]
+		if !found {
+			player1Rank = lastRank
+			lastRank++
+		}
+		player2Rank, found := playersRankings[players[1]]
+		if !found {
+			player2Rank = lastRank
+			lastRank++
+		}
 		teams = append(teams, NewTeam(players[0], players[1], player1Rank, player2Rank))
 	}
 
