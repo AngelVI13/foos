@@ -22,6 +22,8 @@ templ Timer() {
     }
 
     function start_timer() {
+        const maxEffectTimeout = 150; // 2.5 mins
+        var effectsTimeout = getRandomInt(maxEffectTimeout);
         var timer = 10 * 60;
         var beep = new Audio('/static/assets/sounds/beep-warning-6387.mp3');
         var startBtn = document.querySelector('.timer-start');
@@ -47,11 +49,13 @@ templ Timer() {
                 minuteSounds.add(minutes);
             }
 
-            // only activate this ~10% of the time
-            if (getRandomInt(100) > 90) {
+            --effectsTimeout;
+            // only activate this ~5% of the time
+            if (getRandomInt(1000) > 950 && effectsTimeout <= 0) {
                 var soundEffectId = getRandomInt(10);
                 var effectSound = new Audio('/static/assets/sounds/effects/' + soundEffectId + '.wav');
                 effectSound.play();
+                effectsTimeout = getRandomInt(maxEffectTimeout);
             }
 
             minutes = minutes < 10 ? "0" + minutes : minutes;
