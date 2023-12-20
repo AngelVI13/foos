@@ -4,6 +4,10 @@ templ Timer() {
 <script>
     var countDownTimerId = undefined;
 
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
     function reset_timer() {
         if (countDownTimerId === undefined) {
             return;
@@ -41,6 +45,13 @@ templ Timer() {
                 var minSound = new Audio('/static/assets/sounds/numbers/' + minutes + '_minutes.wav');
                 minSound.play();
                 minuteSounds.add(minutes);
+            }
+
+            // only activate this ~10% of the time
+            if (getRandomInt(100) > 90) {
+                var soundEffectId = getRandomInt(10);
+                var effectSound = new Audio('/static/assets/sounds/effects/' + soundEffectId + '.wav');
+                effectSound.play();
             }
 
             minutes = minutes < 10 ? "0" + minutes : minutes;
