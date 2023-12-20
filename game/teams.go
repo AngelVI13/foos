@@ -180,7 +180,7 @@ const (
     `
 )
 
-func PlayersByStats(players []string, stats map[string]*Stats) []string {
+func PlayersBySuccessRate(players []string, stats map[string]*Stats) []string {
 	if len(stats) == 0 {
 		return players
 	}
@@ -196,6 +196,26 @@ func PlayersByStats(players []string, stats map[string]*Stats) []string {
 		}
 
 		return player1Stat.SuccessRate() > player2Stat.SuccessRate()
+	})
+	return players
+}
+
+func PlayersByRankings(players []string, stats map[string]*Stats) []string {
+	if len(stats) == 0 {
+		return players
+	}
+	sort.Slice(players, func(i, j int) bool {
+		player1Stat, player1Found := stats[players[i]]
+		player2Stat, player2Found := stats[players[j]]
+		if !player1Found && !player2Found {
+			return true
+		} else if player1Found && !player2Found {
+			return true
+		} else if !player1Found && player2Found {
+			return false
+		}
+
+		return player1Stat.Score > player2Stat.Score
 	})
 	return players
 }
@@ -218,7 +238,7 @@ func PlayersRankings(stats map[string]*Stats) map[string]int {
 			return false
 		}
 
-		return player1Stat.SuccessRate() > player2Stat.SuccessRate()
+		return player1Stat.Score > player2Stat.Score
 	})
 
 	rankings := map[string]int{}

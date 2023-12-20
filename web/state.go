@@ -34,7 +34,12 @@ func NewGlobalState(
 		log.L.Info("", "p", s.Player, "s", s.SuccessRate())
 	}
 	log.L.Info("", "players before", players)
-	players = game.PlayersByStats(players, stats)
+
+	if judgementDay {
+		players = game.PlayersByRankings(players, stats)
+	} else {
+		players = game.PlayersBySuccessRate(players, stats)
+	}
 	log.L.Info("", "players after", players)
 
 	playersRankings := game.PlayersRankings(stats)
