@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/google/uuid"
 )
@@ -14,6 +15,14 @@ const (
 	Empty Result = "n/a"
 )
 
+type Color string
+
+const (
+	Unknown Color = ""
+	Red     Color = "red"
+	Blue    Color = "blue"
+)
+
 const TBD = "tbd"
 
 type Team struct {
@@ -21,6 +30,7 @@ type Team struct {
 	Player2     string
 	Player1Rank int
 	Player2Rank int
+	Color       Color
 	matchIdx    int
 	scores      []int
 	results     []Result
@@ -32,6 +42,7 @@ func NewTeam(p1, p2 string, p1Rank, p2Rank int) Team {
 		Player2:     p2,
 		Player1Rank: p1Rank,
 		Player2Rank: p2Rank,
+		Color:       Unknown,
 		matchIdx:    0,
 		scores:      []int{0},
 		results:     []Result{Empty},
@@ -137,6 +148,14 @@ type Match struct {
 
 func NewMatch(t1, t2 *Team) Match {
 	id := uuid.New()
+
+	t1.Color = Red
+	t2.Color = Blue
+	if rand.Intn(100) < 50 {
+		t1.Color = Blue
+		t2.Color = Red
+	}
+
 	return Match{
 		Id:    id.String(),
 		team1: t1,

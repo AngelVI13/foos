@@ -188,3 +188,21 @@ h1, h2, h3, h4, h5, h6 {
 .current-{
     color: darkgray;
 }
+
+.red-block, .blue-block {
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    display: inline-block;
+    border: 1px solid gray;
+    vertical-align: middle;
+    border-radius: 2px;
+}
+
+.red-block {
+    background: red;
+}
+
+.blue-block {
+    background: blue;
+}

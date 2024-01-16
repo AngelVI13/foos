@@ -54,6 +54,9 @@ templ TeamRow(team *game.Team, url string, round int) {
     }
     >
     <td>
+        if team.CurrentMatch() == round {
+            <span class={fmt.Sprintf("%s-block", team.Color)}></span>
+        }
         <span> { team.Player1 } </span>
         if team.Player1Rank != -1 {
             <span class={"numberCircle", fmt.Sprintf("current-%s", team.Player1RankClass()) }>{ fmt.Sprint(team.Player1Rank) }</span>
